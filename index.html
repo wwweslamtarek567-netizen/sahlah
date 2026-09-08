@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>سهلة - توصيل بقي أسهل</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Cairo',sans-serif}
+body{background:#f5f5f5;color:#333}
+.page{display:none;padding:15px;max-width:450px;margin:auto;background:#fff;min-height:100vh;padding-bottom:80px}
+.page.active{display:block}
+.orange{background:#ff6b00;color:#fff}
+.btn{background:#ff6b00;color:#fff;border:none;padding:12px;width:100%;border-radius:10px;font-size:16px;margin:10px 0;cursor:pointer}
+.btn-white{background:#fff;color:#ff6b00;border:2px solid #ff6b00}
+input,select{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border-radius:8px;font-size:15px}
+.header{text-align:center;padding:20px 0;position:relative}
+.header img{width:120px}
+.admin-btn{position:absolute;top:10px;left:10px;background:#000;color:#fff;padding:5px 10px;border-radius:5px;font-size:12px;cursor:pointer}
+.card{background:#fff;border-radius:12px;padding:15px;margin:10px 0;box-shadow:0 2px 5px rgba(0,0,0,0.1)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.balance{font-size:32px;color:#ff6b00;font-weight:bold;text-align:center}
+.bottom-nav{display:flex;justify-content:space-around;position:fixed;bottom:0;left:0;right:0;background:#fff;padding:10px 0;border-top:1px solid #ddd;max-width:450px;margin:auto}
+.bottom-nav div{text-align:center;font-size:12px;color:#666;cursor:pointer}
+.bottom-nav.active{color:#ff6b00}
+#map{height:300px;border-radius:10px;margin:10px 0}
+.admin-panel{display:none;background:#1a1a1a;color:#fff;padding:15px;border-radius:10px;margin:10px 0}
+.admin-panel.active{display:block}
+</style>
+</head>
+<body>
+
+<!-- زرار لوحة التحكم ثابت -->
+<div class="admin-btn" onclick="toggleAdmin()">⚙️ الادارة</div>
+
+<!-- 1. صفحة التسجيل -->
+<div id="register" class="page active orange">
+  <div class="header">
+    <h1>سهلة</h1>
+    <p>التوصيل بقي أسهل</p>
+  </div>
+  <div class="card" style="color:#000">
+    <h3>تسجيل مندوب جديد</h3>
+    <input id="name" placeholder="الاسم">
+    <input id="age" type="number" placeholder="السن">
+    <input id="address" placeholder="العنوان">
+    <select id="vehicle">
+      <option>على رجلك</option>
+      <option>عجلة</option>
+      <option>موتوسيكل</option>
+    </select>
+    <button class="btn" onclick="register()">تسجيل</button>
+  </div>
+
+  <!-- لوحة التحكم هنا -->
+  <div id="adminPanel" class="admin-panel">
+    <h3>🔒 لوحة التحكم</h3>
+    <input id="adminPass" type="password" placeholder="كلمة السر: admin123">
+    <button class="btn" onclick="loginAdmin()">دخول</button>
+    <div id="adminContent" style="display:none">
+      <h4>المندوبين</h4>
+      <div id="driversList"></div>
+      <input id="addBalance" type="number" placeholder="مبلغ الشحن">
+      <button class="btn" onclick="addDriverBalance()">شحن رصيد</button>
+      <button class="btn" onclick="sendOrder()">إرسال اوردر جديد - خصم 20%</button>
+      <h4>الاسكرينات المرسلة</h4>
+      <div id="receiptsList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 2. الصفحة الرئيسية للمندوب -->
+<div id="home" class="page orange">
+  <div class="header">
+    <h1>سهلة</h1>
+    <p>التوصيل بقي أسهل</p>
+  </div>
+  <div class="card" style="color:#000">
+    <p>أنت الآن <b>متاح للعمل</b> <span style="color:green">●</span></p>
+  </div>
+  <div class="card" style="color:#000;text-align:center">
+    <p>رصيدك الحالي</p>
+    <div class="balance" id="balance">50</div>
+    <p>جنيه</p>
+  </div>
+  <div class="grid">
+    <div class="card" style="text-align:center;cursor:pointer" onclick="showPage('orders')">📦<br>الطلبات الجديدة</div>
+    <div class="card" style="text-align:center;cursor:pointer" onclick="showPage('wallet')">💰<br>محفظتي</div>
+    <div class="card" style="text-align:center;cursor:pointer" onclick="showPage('mapPage')">📍<br>الخريطة</div>
+    <div class="card" style="text-align:center;cursor:pointer" onclick="showPage('account')">👤<br>الحساب</div>
+  </div>
+</div>
+
+<!-- 3. صفحة الخريطة -->
+<div id="mapPage" class="page">
+  <h3>أنت متاح للعمل <span style="color:green">●</span></h3>
+  <div id="map"></div>
+  <div class="card">
+    <p><b>موقعك الحالي</b></p>
+    <p id="currentLocation">جار تحديد الموقع...</p>
+    <button class="btn" onclick="getLocation()">تحديث الموقع</button>
+  </div>
+  <div class="bottom-nav">
+    <div onclick="showPage('account')">الحساب</div>
+    <div onclick="showPage('orders')">الطلبات</div>
+    <div class="active">الخريطة</div>
+    <div onclick="showPage('home')">الرئيسية</div>
+  </div>
+</div>
+
+<!-- 4. صفحة المحفظة والدفع -->
+<div id="wallet" class="page">
+  <h3>شحن الرصيد</h3>
+  <div class="card">
+    <p>حول فودافون كاش على:</p>
+    <p><b>01023284996</b></p>
+    <p><b>01025025973</b></p>
+    <input type="file" id="receipt">
+    <button class="btn" onclick="sendReceipt()">إرسال الاسكرين</button>
+  </div>
+  <div class="card">
+    <p>الدعم: <a href="https://wa.me/201040791442" target="_blank">01040791442 واتساب</a></p>
+  </div>
+  <button class="btn-white" onclick="showPage('home')">رجوع</button>
+</div>
+
+<!-- 5. صفحة الطلبات -->
+<div id="orders" class="page">
+  <h3>الطلبات الجديدة</h3>
+  <div id="ordersList" class="card">لا يوجد طلبات حاليا</div>
+  <button class="btn-white" onclick="showPage('home')">رجوع</button>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+let driver = JSON.parse(localStorage.getItem('driver')) || {balance:0,name:'مندوب تجربة'};
+let receipts = JSON.parse(localStorage.getItem('receipts')) || [];
+
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if(id=='mapPage') initMap();
+  if(id=='home') document.getElementById('balance').innerText = driver.balance;
+}
+
+function toggleAdmin(){
+  document.getElementById('adminPanel').classList.toggle('active');
+}
+
+function register(){
+  driver = {name:document.getElementById('name').value,balance:50};
+  localStorage.setItem('driver',JSON.stringify(driver));
+  alert('تم التسجيل! تم اضافة 50 جنيه بونص');
+  showPage('home');
+}
+
+function initMap(){
+  setTimeout(()=>{
+    let map = L.map('map').setView([30.0444,31.2357],13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+    getLocation();
+  },100)
+}
+
+function getLocation(){
+  navigator.geolocation.getCurrentPosition(pos=>{
+    document.getElementById('currentLocation').innerText = 'تم تحديد موقعك';
+  });
+}
+
+function sendReceipt(){
+  let file = document.getElementById('receipt').files[0];
+  if(file){
+    receipts.push({name:driver.name,time:new Date().toLocaleString()});
+    localStorage.setItem('receipts',JSON.stringify(receipts));
+    alert('تم ارسال الاسكرين للادارة');
+  }
+}
+
+function loginAdmin(){
+  if(document.getElementById('adminPass').value=='admin123'){
+    document.getElementById('adminContent').style.display='block';
+    document.getElementById('driversList').innerHTML = `<div class="card" style="color:#000">${driver.name} - الرصيد: ${driver.balance} جنيه</div>`;
+    document.getElementById('receiptsList').innerHTML = receipts.map(r=>`<div class="card" style="color:#000">${r.name} - ${r.time}</div>`).join('');
+  }else alert('كلمة السر غلط');
+}
+
+function addDriverBalance(){
+  driver.balance += parseInt(document.getElementById('addBalance').value);
+  localStorage.setItem('driver',JSON.stringify(driver));
+  alert('تم الشحن. الرصيد الجديد: '+driver.balance);
+  loginAdmin();
+}
+
+function sendOrder(){
+  alert('تم ارسال اوردر جديد للمندوب');
+  driver.balance -= driver.balance * 0.2; // خصم 20%
+  localStorage.setItem('driver',JSON.stringify(driver));
+  document.getElementById('ordersList').innerHTML = `<div class="card" style="color:#000">اوردر جديد - القيمة 100ج - خصم 20ج</div>`;
+  loginAdmin();
+}
+</script>
+</body>
+  </html>
