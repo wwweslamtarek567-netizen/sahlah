@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>التسجيل - سهلة</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Cairo',sans-serif}
+body{background:#ff6a00;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.container{background:white;border-radius:20px;padding:30px 25px;width:100%;max-width:400px}
+.logo{text-align:center;color:#ff6a00;margin-bottom:25px}
+.logo .icon{font-size:40px}
+.logo h1{font-size:35px;font-weight:900}
+.logo p{font-size:13px;color:#666}
+input{width:100%;padding:14px;border:2px solid #eee;border-radius:12px;margin-bottom:12px;font-size:15px}
+input:focus{border-color:#ff6a00;outline:none}
+.btn{width:100%;padding:15px;background:#ff6a00;color:white;border:none;border-radius:12px;font-size:17px;font-weight:700;margin-top:10px}
+.link{text-align:center;margin-top:15px;font-size:14px}
+.link a{color:#ff6a00;font-weight:700;text-decoration:none}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+  <div class="logo">
+    <div class="icon">🏍️</div>
+    <h1>سهلة</h1>
+    <p>التوصيل بقي أسهل</p>
+  </div>
+
+  <input type="text" placeholder="الاسم كامل">
+  <input type="tel" placeholder="رقم الهاتف">
+  <input type="password" placeholder="كلمة المرور">
+  <input type="password" placeholder="تأكيد كلمة المرور">
+
+  <button class="btn" onclick="window.location='home.html'">تسجيل</button>
+
+  <div class="link">
+    عندك حساب؟ <a href="home.html">تسجيل الدخول</a>
+  </div>
+</div>
+</body>
+    </html>
