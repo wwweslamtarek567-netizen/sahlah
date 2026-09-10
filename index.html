@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تسجيل مندوب جديد</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Cairo', sans-serif;}
+body{background-color: #ff6a00;min-height: 100vh;}
+.top-bg{width: 100%;height: 50vh;background-image: url('bg.jpg.png');background-size: cover;background-position: top center;background-repeat: no-repeat;}
+.container{background: white;border-radius: 30px 30px 0 0;padding: 25px 20px;margin-top: -30px;box-shadow: 0 -5px 20px rgba(0,0,0,0.1);}
+.title{text-align: center;color: #ff6a00;font-size: 20px;font-weight: 700;margin-bottom: 20px;}
+.input{margin-bottom: 12px;position: relative;}
+.input input{width: 100%;padding: 14px 45px 14px 15px;border: 2px solid #eee;border-radius: 12px;font-size: 15px;background: #f9f9f9;outline: none;text-align: right;}
+.input input:focus{border-color: #ff6a00;background: white;}
+.icon{position: absolute;right: 15px;top: 50%;transform: translateY(-50%);font-size: 18px;}
+.question{text-align: center;font-size: 16px;font-weight: 700;margin: 20px 0 10px;color: #333;}
+.options{display: flex;gap: 10px;margin-bottom: 20px;}
+.option{flex: 1;border: 2px solid #eee;border-radius: 12px;padding: 10px 5px;text-align: center;cursor: pointer;background: #f9f9f9;transition: 0.3s;}
+.option.active{border-color: #ff6a00;background: #fff5f0;}
+.option-icon{font-size: 28px;margin-bottom: 5px;}
+.option-text{font-size: 13px;font-weight: 600;}
+.btn{width: 100%;padding: 16px;background: #ff6a00;color: white;border: none;border-radius: 14px;font-size: 18px;font-weight: 700;margin-bottom: 15px;cursor: pointer;}
+.btn:active{transform: scale(0.98);}
+.login{text-align: center;font-size: 14px;color: #666;}
+.login a{color: #ff6a00;font-weight: 700;text-decoration: none;}
+</style>
+</head>
+<body>
+
+<div class="top-bg"></div>
+
+<div class="container">
+  <h2 class="title">تسجيل مندوب جديد</h2>
+
+  <form id="registerForm">
+    <div class="input">
+      <span class="icon">👤</span>
+      <input type="text" id="name" placeholder="الاسم الكامل" required>
+    </div>
+    <div class="input">
+      <span class="icon">📅</span>
+      <input type="number" id="age" placeholder="السن" required>
+    </div>
+    <div class="input">
+      <span class="icon">📍</span>
+      <input type="text" id="address" placeholder="العنوان" required>
+    </div>
+
+    <p class="question">معاك ايه ؟</p>
+    <div class="options">
+      <div class="option" data-value="موتوسيكل">
+        <div class="option-icon">🏍️</div>
+        <div class="option-text">موتوسيكل</div>
+      </div>
+      <div class="option" data-value="عجلة">
+        <div class="option-icon">🚲</div>
+        <div class="option-text">عجلة</div>
+      </div>
+      <div class="option" data-value="على رجلك">
+        <div class="option-icon">🚶</div>
+        <div class="option-text">على رجلك</div>
+      </div>
+    </div>
+    <input type="hidden" id="vehicle" required>
+
+    <button type="submit" class="btn">تسجيل</button>
+  </form>
+
+  <p class="login">لديك حساب ؟ <a href="#">تسجيل دخول</a></p>
+</div>
+
+<script>
+// اختيار موتوسيكل / عجلة / على رجلك
+const options = document.querySelectorAll('.option');
+const vehicleInput = document.getElementById('vehicle');
+
+options.forEach(option => {
+  option.addEventListener('click', () => {
+    options.forEach(o => o.classList.remove('active'));
+    option.classList.add('active');
+    vehicleInput.value = option.dataset.value;
+  });
+});
+
+// عند الدوس على تسجيل
+document.getElementById('registerForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  
+  if(!vehicleInput.value){
+    alert('اختار معاك ايه الاول');
+    return;
+  }
+
+  // هنا المفروض تبعت البيانات للسيرفر
+  // دلوقتي هنحوله على الصفحة الرئيسية على طول
+  window.location.href = "home.html"; 
+});
+</script>
+
+</body>
+        </html>
