@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تفاصيل الطلب</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<style>
+body{margin:0;font-family:'Cairo',sans-serif;background:#f7f7f7;}
+.header{background:#ff6a00;color:white;padding:15px;display:flex;justify-content:space-between;align-items:center;border-bottom-left-radius:25px;border-bottom-right-radius:25px;}
+.header i{font-size:20px;cursor:pointer;}
+.header .logo{text-align:center;font-size:22px;font-weight:800;}
+.header .logo span{font-size:13px;font-weight:400;display:block;}
+
+#map{height:35vh;width:100%;}
+.map-badge{position:absolute;z-index:1000;padding:8px 12px;border-radius:15px;font-weight:700;font-size:13px;color:white;text-align:center;}
+.badge-a{top:20px;right:20px;background:#007bff;}
+.badge-b{top:20px;left:20px;background:#28a745;}
+
+.card{background:white;margin:-20px 15px 15px 15px;padding:15px;border-radius:20px;box-shadow:0 4px 15px rgba(0,0,0,0.1);position:relative;z-index:1001;}
+.tag{background:#ff6a00;color:white;padding:8px 15px;border-radius:25px;display:inline-flex;align-items:center;gap:8px;font-weight:700;}
+.price{float:left;text-align:left;}
+.price .km{font-size:13px;color:#666;}
+.price .amount{font-size:28px;font-weight:800;}
+
+.info{display:flex;gap:15px;margin:15px 0;}
+.info-main{flex:1;}
+.info-main h3{margin:5px 0;font-size:18px;display:flex;align-items:center;gap:8px;}
+.info-main p{margin:5px 0;color:#666;font-size:14px;}
+.client{text-align:center;border-right:1px solid #eee;padding-right:15px;min-width:70px;}
+.client img{width:60px;height:60px;border-radius:50%;background:#ddd;}
+.client .rate{color:#ffc107;font-weight:700;}
+
+/* الالوان الجديدة */
+.btn-accept{background:#ff6a00;color:white;width:100%;padding:15px;border:none;border-radius:15px;font-family:'Cairo';font-size:18px;font-weight:800;display:flex;justify-content:center;align-items:center;gap:10px;margin:10px 0;cursor:pointer;}
+.btn-picked{background:#dc3545;color:white;width:100%;padding:15px;border:none;border-radius:15px;font-family:'Cairo';font-size:18px;font-weight:800;display:flex;justify-content:center;align-items:center;gap:10px;margin:10px 0;cursor:pointer;}
+.btn-toClient{background:#007aff;color:white;width:100%;padding:15px;border:none;border-radius:15px;font-family:'Cairo';font-size:18px;font-weight:800;display:flex;justify-content:center;align-items:center;gap:10px;margin:10px 0;cursor:pointer;}
+.btn-deliver{background:#00a651;color:white;width:100%;padding:15px;border:none;border-radius:15px;font-family:'Cairo';font-size:18px;font-weight:800;display:flex;justify-content:center;align-items:center;gap:10px;margin:10px 0;cursor:pointer;}
+
+.suggest{text-align:center;margin:15px 0;font-weight:700;font-size:16px;color:#666;}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <i class="fa-solid fa-arrow-right" onclick="history.back()"></i>
+  <div class="logo">سهلة <span>للتوصيل</span></div>
+  <i class="fa-solid fa-bars"></i>
+</div>
+
+<div style="position:relative;">
+  <div id="map"></div>
+  <div class="map-badge badge-a">4 دقيقة<br>1,0 كم</div>
+  <div class="map-badge badge-b">15 دقيقة<br>11,6 كم</div>
+</div>
+
+<div class="card">
+  <div style="display:flex;justify-content:space-between;align-items:start;">
+    <div class="tag"><i class="fa-solid fa-motorcycle"></i> طلب توصيل</div>
+    <div class="price">
+      <div class="km"><i class="fa-regular fa-clock"></i> 1,0 كم</div>
+      <div class="amount"><span id="orderPrice">40</span> جنيه</div>
+    </div>
+  </div>
+
+  <div class="info">
+    <div class="info-main">
+      <h3>مطعم الشيف حسن <i class="fa-solid fa-utensils" style="color:#ff6a00;"></i></h3>
+      <p>CJG+RV). المنصورة الجديدة<br>المنصورة الجديدة، محافظة الدقهلية<br>(الساموني)</p>
+    </div>
+    <div class="client">
+      <img src="https://ui-avatars.com/api/?name=العميل&background=E0E0E0&color=333">
+      <div style="font-weight:700;">العميل</div>
+      <div class="rate">4.93 <i class="fa-solid fa-star"></i></div>
+      <div style="font-size:12px;color:#666;">(24)<br>الآن</div>
+    </div>
+  </div>
+
+  <!-- ال 4 زراير كلهم ظاهرين -->
+  <button class="btn-accept" onclick="acceptOrder()">
+    <i class="fa-solid fa-motorcycle"></i> القبول مقابل <span id="btnPrice">40</span> جنيه
+  </button>
+
+  <button class="btn-picked" onclick="pickedOrder()">
+    <i class="fa-solid fa-circle-check"></i> استلمت الطلب
+  </button>
+
+  <button class="btn-toClient" onclick="goToClient()">
+    <i class="fa-solid fa-location-arrow"></i> الاتجاه الى العميل
+  </button>
+
+  <button class="btn-deliver" onclick="deliverOrder()">
+    <i class="fa-solid fa-box"></i> تم تسليم الطلب
+  </button>
+
+  <div class="suggest">اقترح أجرك</div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+var commission = 40; // عمولة الطلب
+var pointA = [31.0422,31.3787]; // المطعم
+var pointB = [31.0409,31.3756]; // العميل
+
+document.getElementById('btnPrice').innerText = commission;
+document.getElementById('orderPrice').innerText = commission;
+
+var map = L.map('map', {zoomControl: false}).setView([31.0415,31.3770], 13);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+L.marker(pointA).addTo(map).bindPopup("A - المطعم");
+L.marker(pointB).addTo(map).bindPopup("B - العميل");
+L.polyline([pointA, pointB], {color: '#28a745', weight: 4}).addTo(map);
+
+// 1. القبول اورنج - يفتح الخريطة للمطعم
+function acceptOrder(){
+  window.open(`https://www.google.com/maps/dir/?api=1&destination=${pointA[0]},${pointA[1]}`, '_blank');
+  alert("تم قبول الطلب");
+}
+
+// 2. استلمت احمر
+function pickedOrder(){
+  alert("تم استلام الطلب من المطعم");
+}
+
+// 3. الاتجاه للعميل ازرق - يفتح الخريطة للعميل
+function goToClient(){
+  window.open(`https://www.google.com/maps/dir/?api=1&destination=${pointB[0]},${pointB[1]}`, '_blank');
+}
+
+// 4. تم التسليم اخضر - يخصم 15% من localStorage
+function deliverOrder(){
+  let balance = parseFloat(localStorage.getItem('balance'));
+  let deduct = commission * 0.15; // 15% من 40 = 6 جنيه
+  balance = balance - deduct;
+  if(balance < 0) balance = 0;
+  localStorage.setItem('balance', balance.toFixed(2));
+  
+  alert(`✓ تم تسليم الطلب بنجاح\n\nتم خصم ${deduct} جنيه عمولة\nرصيدك الحالي: ${balance.toFixed(2)} جنيه`);
+  
+  if(balance <= 0){
+    alert('رصيدك صفر. برجاء الشحن لاستلام طلبات جديدة');
+  }
+  window.location = 'home.html'; // يرجع للرئيسية والرصيد يتحدث
+}
+</script>
+</body>
+  </html>
