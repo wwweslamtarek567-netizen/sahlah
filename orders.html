@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>طلباتك الجديدة</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<style>
+body{margin:0;font-family:'Cairo',sans-serif;background:#f7f7f7;padding-bottom:80px;}
+.header{background:white;padding:15px;text-align:center;box-shadow:0 2px 5px rgba(0,0,0,0.05);}
+.logo{color:#ff6a00;font-size:22px;font-weight:800;}
+.logo span{font-size:13px;font-weight:400;display:block;}
+.top-bar{display:flex;justify-content:space-between;align-items:center;padding:15px;}
+.new-orders{color:#ff6a00;font-weight:700;font-size:14px;}
+.new-orders i{margin-left:5px;}
+.title{text-align:center;font-size:24px;font-weight:800;margin:10px 0 20px 0;}
+
+.order-card{background:white;margin:10px 15px;padding:15px;border-radius:15px;box-shadow:0 2px 10px rgba(0,0,0,0.05);display:flex;gap:10px;}
+.order-left{text-align:center;min-width:70px;}
+.order-icon{font-size:35px;color:#ff6a00;}
+.commission{color:#ff6a00;font-weight:800;font-size:16px;}
+.commission span{font-size:12px;font-weight:400;color:#666;display:block;}
+
+.order-center{flex:1;}
+.addr{font-size:14px;font-weight:700;margin-bottom:8px;}
+.addr i{color:#ff6a00;margin-left:5px;}
+.addr .to{color:#28a745;}
+.time{float:left;background:#fff3e0;color:#ff6a00;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:700;}
+.time i{margin-left:4px;}
+.details{display:flex;gap:15px;font-size:12px;color:#666;margin-top:10px;}
+.details i{color:#ff6a00;}
+
+.order-right{display:flex;align-items:center;}
+.btn-accept{background:#ff6a00;color:white;border:none;padding:10px 18px;border-radius:25px;font-family:'Cairo';font-weight:700;font-size:13px;cursor:pointer;}
+.btn-accept i{margin-left:5px;}
+
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:white;display:flex;justify-content:space-around;padding:10px 0;box-shadow:0 -2px 10px rgba(0,0,0,0.05);}
+.nav-item{text-align:center;color:#999;font-size:12px;text-decoration:none;}
+.nav-item.active{color:#ff6a00;font-weight:700;}
+.nav-item i{font-size:20px;display:block;margin-bottom:3px;}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">سهلة <span>التوصيل بقي أسهل</span></div>
+</div>
+
+<div class="top-bar">
+  <div class="new-orders"><i class="fa-solid fa-bell"></i> 5 طلبات جديدة</div>
+  <div style="font-weight:700;">طلبات التوصيل</div>
+</div>
+
+<h2 class="title">طلباتك الجديدة</h2>
+
+<!-- طلب 1: شارع الجمهوريه - حي الجامعه -->
+<div class="order-card">
+  <div class="order-left">
+    <i class="fa-solid fa-box order-icon"></i>
+    <div class="commission">12.00<br><span>ج.م العمولة</span></div>
+  </div>
+  <div class="order-center">
+    <div class="time"><i class="fa-regular fa-clock"></i> منذ 5 دقائق</div>
+    <div class="addr"><i class="fa-solid fa-location-dot"></i> شارع الجمهورية - المنصورة</div>
+    <div class="addr to"><i class="fa-solid fa-location-dot"></i> حي الجامعة - المنصورة</div>
+    <div class="details">
+      <div><i class="fa-solid fa-route"></i> المسافة: 4.5 كم</div>
+      <div><i class="fa-solid fa-person-walking"></i> المشوار: مشي</div>
+    </div>
+  </div>
+  <div class="order-right">
+    <button class="btn-accept" onclick="openDirections(31.0422,31.3787,31.0409,31.3756)">قبول الطلب <i class="fa-solid fa-arrow-left"></i></button>
+  </div>
+</div>
+
+<!-- طلب 2: ميدان الساعه - كفر البطيخ -->
+<div class="order-card">
+  <div class="order-left">
+    <i class="fa-solid fa-box order-icon"></i>
+    <div class="commission">15.00<br><span>ج.م العمولة</span></div>
+  </div>
+  <div class="order-center">
+    <div class="time"><i class="fa-regular fa-clock"></i> منذ 12 دقيقة</div>
+    <div class="addr"><i class="fa-solid fa-location-dot"></i> ميدان الساعة - المنصورة</div>
+    <div class="addr to"><i class="fa-solid fa-location-dot"></i> كفر البطيخ - الدقهلية</div>
+    <div class="details">
+      <div><i class="fa-solid fa-route"></i> المسافة: 8.2 كم</div>
+      <div><i class="fa-solid fa-motorcycle"></i> المشوار: موتوسيكل</div>
+    </div>
+  </div>
+  <div class="order-right">
+    <button class="btn-accept" onclick="openDirections(31.0422,31.3787,31.1886,31.9002)">قبول الطلب <i class="fa-solid fa-arrow-left"></i></button>
+  </div>
+</div>
+
+<!-- طلب 3: جامعه المنصوره - المنصوره الجديدة -->
+<div class="order-card">
+  <div class="order-left">
+    <i class="fa-solid fa-box order-icon"></i>
+    <div class="commission">10.00<br><span>ج.م العمولة</span></div>
+  </div>
+  <div class="order-center">
+    <div class="time"><i class="fa-regular fa-clock"></i> منذ 18 دقيقة</div>
+    <div class="addr"><i class="fa-solid fa-location-dot"></i> جامعة المنصورة - المنصورة</div>
+    <div class="addr to"><i class="fa-solid fa-location-dot"></i> المنصورة الجديدة</div>
+    <div class="details">
+      <div><i class="fa-solid fa-route"></i> المسافة: 6.7 كم</div>
+      <div><i class="fa-solid fa-person-walking"></i> المشوار: مشي</div>
+    </div>
+  </div>
+  <div class="order-right">
+    <button class="btn-accept" onclick="openDirections(31.0409,31.3708,31.3050,31.7300)">قبول الطلب <i class="fa-solid fa-arrow-left"></i></button>
+  </div>
+</div>
+
+<!-- طلب 4: الحي الخامس - طناح -->
+<div class="order-card">
+  <div class="order-left">
+    <i class="fa-solid fa-box order-icon"></i>
+    <div class="commission">18.00<br><span>ج.م العمولة</span></div>
+  </div>
+  <div class="order-center">
+    <div class="time"><i class="fa-regular fa-clock"></i> منذ 25 دقيقة</div>
+    <div class="addr"><i class="fa-solid fa-location-dot"></i> الحي الخامس - المنصورة</div>
+    <div class="addr to"><i class="fa-solid fa-location-dot"></i> طناح - الدقهلية</div>
+    <div class="details">
+      <div><i class="fa-solid fa-route"></i> المسافة: 10.4 كم</div>
+      <div><i class="fa-solid fa-bicycle"></i> المشوار: دراجة</div>
+    </div>
+  </div>
+  <div class="order-right">
+    <button class="btn-accept" onclick="openDirections(31.0320,31.3800,31.0714,31.4250)">قبول الطلب <i class="fa-solid fa-arrow-left"></i></button>
+  </div>
+</div>
+
+<!-- طلب 5: المكتبه العامه - شربين -->
+<div class="order-card">
+  <div class="order-left">
+    <i class="fa-solid fa-box order-icon"></i>
+    <div class="commission">14.00<br><span>ج.م العمولة</span></div>
+  </div>
+  <div class="order-center">
+    <div class="time"><i class="fa-regular fa-clock"></i> منذ 32 دقيقة</div>
+    <div class="addr"><i class="fa-solid fa-location-dot"></i> المكتبة العامة - المنصورة</div>
+    <div class="addr to"><i class="fa-solid fa-location-dot"></i> شربين - الدقهلية</div>
+    <div class="details">
+      <div><i class="fa-solid fa-route"></i> المسافة: 14.8 كم</div>
+      <div><i class="fa-solid fa-motorcycle"></i> المشوار: موتوسيكل</div>
+    </div>
+  </div>
+  <div class="order-right">
+    <button class="btn-accept" onclick="openDirections(31.0422,31.3787,31.2300,31.5800)">قبول الطلب <i class="fa-solid fa-arrow-left"></i></button>
+  </div>
+</div>
+
+<!-- طلب 6: امام مستشفى الجامعه - المنصوره الجديدة -->
+<div class="order-card">
+  <div class="order-left">
+    <i class="fa-solid fa-box order-icon"></i>
+    <div class="commission">11.00<br><span>ج.م العمولة</span></div>
+  </div>
+  <div class="order-center">
+    <div class="time"><i class="fa-regular fa-clock"></i> منذ 36 دقيقة</div>
+    <div class="addr"><i class="fa-solid fa-location-dot"></i> امام مستشفى الجامعة - المنصورة</div>
+    <div class="addr to"><i class="fa-solid fa-location-dot"></i> المنصورة الجديدة</div>
+    <div class="details">
+      <div><i class="fa-solid fa-route"></i> المسافة: 5.2 كم</div>
+      <div><i class="fa-solid fa-person-walking"></i> المشوار: مشي</div>
+    </div>
+  </div>
+  <div class="order-right">
+    <button class="btn-accept" onclick="openDirections(31.0400,31.3700,31.3050,31.7300)">قبول الطلب <i class="fa-solid fa-arrow-left"></i></button>
+  </div>
+</div>
+
+<div class="bottom-nav">
+  <a href="profile.html" class="nav-item"><i class="fa-regular fa-user"></i>حسابي</a>
+  <a href="orders.html" class="nav-item active"><i class="fa-solid fa-list"></i>الطلبات</a>
+  <a href="map.html" class="nav-item"><i class="fa-regular fa-location-dot"></i>الموقع</a>
+  <a href="home.html" class="nav-item"><i class="fa-solid fa-house"></i>الرئيسية</a>
+</div>
+
+<script>
+function openDirections(fromLat, fromLng, toLat, toLng){
+  // بيفتح جوجل ماب بالطريق من موقع الانطلاق لموقع العميل
+  var url = `https://www.google.com/maps/dir/${fromLat},${fromLng}/${toLat},${toLng}`;
+  window.open(url, '_blank');
+}
+</script>
+
+</body>
+  </html>
