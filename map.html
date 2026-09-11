@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>موقعك الحالي</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'Cairo',sans-serif;background:#f5f5f5;}
+.header{background:#ff6a00;color:white;padding:15px;text-align:center;font-size:18px;font-weight:700;position:fixed;top:0;left:0;right:0;z-index:1000;}
+#map{height:100vh;width:100%;padding-top:55px;}
+.btns{position:fixed;bottom:80px;left:10px;right:10px;display:flex;gap:10px;z-index:1000;}
+.btn{flex:1;background:#ff6a00;color:white;padding:14px;text-align:center;border-radius:15px;text-decoration:none;font-weight:700;border:none;font-size:15px;font-family:'Cairo';}
+.btn:active{background:#e55a00;}
+.back-btn{position:fixed;bottom:15px;left:50%;transform:translateX(-50%);background:#333;color:white;padding:12px 30px;border-radius:25px;text-decoration:none;font-weight:700;z-index:1000;}
+.status{position:fixed;bottom:140px;left:10px;right:10px;background:white;padding:12px;border-radius:15px;text-align:center;box-shadow:0 4px 15px rgba(0,0,0,0.2);z-index:1000;font-size:14px;}
+</style>
+</head>
+<body>
+
+<div class="header">📍 موقعك الحالي</div>
+
+<div id="map"></div>
+
+<div class="status" id="status">جاري تحديد الموقع...</div>
+
+<div class="btns">
+  <button class="btn" onclick="getCurrentLocation()">📍 موقعي الحالي</button>
+  <button class="btn" onclick="getDirections()">🧭 تحديد الاتجاهات</button>
+</div>
+
+<a href="home.html" class="back-btn">رجوع للرئيسية</a>
+
+<script>
+var map, marker, directionsService, directionsRenderer;
+var userLat, userLng;
+
+// 1. زرار موقعي الحالي
+function getCurrentLocation(){
+  document.getElementById("status").innerHTML = "جاري تحديد الموقع...";
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function(pos){
+      userLat = pos.coords.latitude;
+      userLng = pos.coords.longitude;
+      var pos = {lat: userLat, lng: userLng};
+      
+      map.setCenter(pos);
+      map.setZoom(16);
+
+      if(marker) marker.setMap(null);
+      marker = new google.maps.Marker({
+        position: pos,
+        map: map,
+        title: "موقعك الحالي"
+      });
+
+      document.getElementById("status").innerHTML = "تم تحديد الموقع بنجاح";
+    }, function(){
+      document.getElementById("status").innerHTML = "فشل. فعل الـ GPS";
+    });
+  }
+}
+
+// 2. زرار تحديد الاتجاهات
+function getDirections(){
+  if(!userLat){
+    alert("لازم تحدد موقعك الاول");
+    getCurrentLocation();
+    return;
+  }
+
+  document.getElementById("status").innerHTML = "جاري حساب الطريق...";
+
+  // هنا حط وجهتك - مثال: الكورنيش جمصة
+  var destination = {lat: 31.2660, lng: 31.3740};
+
+  var request = {
+    origin: {lat: userLat, lng: userLng},
+    destination: destination,
+    travelMode: 'DRIVING'
+  };
+
+  directionsService.route(request, function(result, status) {
+    if (status == 'OK') {
+      directionsRenderer.setDirections(result);
+      document.getElementById("status").innerHTML = "الطريق جاهز باللون الازرق";
+    } else {
+      document.getElementById("status").innerHTML = "فشل في تحديد الاتجاهات";
+    }
+  });
+}
+
+// تشغيل الخريطة اول ما الصفحة تفتح
+function initMap() {
+  map = new google.maps.Map(document.getElementById("map"), {
+    center: {lat: 31.2628, lng: 31.3748}, // جمصة
+    zoom: 14,
+    mapTypeControl: false,
+    streetViewControl: false
+  });
+
+  directionsService = new google.maps.DirectionsService();
+  directionsRenderer = new google.maps.DirectionsRenderer({
+    map: map,
+    suppressMarkers: false
+  });
+
+  getCurrentLocation(); // يحدد الموقع تلقائي
+}
+</script>
+
+<!-- ده سطر جوجل ماب. شغال بدون مفتاح بس هيطلع رسالة صغيرة -->
+<script src="https://maps.googleapis.com/maps/api/js?callback=initMap" async defer></script>
+
+</body>
+  </html>
