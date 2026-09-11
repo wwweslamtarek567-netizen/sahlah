@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>سهلة للتوصيل</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Cairo',sans-serif;background:#f0f0f0}
+
+/* الهيدر */
+.header{background:#ff6600;color:white;padding:8px 12px;display:flex;justify-content:space-between;align-items:center}
+.header.center{flex:1;text-align:center;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:4px}
+.header.center i{font-size:20px}
+.header i{font-size:20px;color:white}
+
+/* الخريطة */
+.map{position:relative;height:38vh;background:url('map-bg.png') center/cover no-repeat}
+.badge{position:absolute;top:8px;padding:6px 9px;border-radius:10px;color:white;font-weight:700;font-size:11px;text-align:center;line-height:1.3}
+.badge-green{left:8px;background:#00a651}
+.badge-blue{right:8px;background:#007aff}
+
+.card{background:white;margin:-15px 6px 10px 6px;border-radius:14px;padding:10px}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.tag{background:#ff6600;color:white;padding:6px 9px;border-radius:14px;font-weight:700;font-size:11px;display:flex;align-items:center;gap:4px}
+.tag i{font-size:12px}
+.price{text-align:left}
+.price.km{font-size:11px;color:#666;display:flex;align-items:center;gap:3px;justify-content:flex-end}
+.price.km i{color:#ff6600;font-size:11px}
+.price.amount{font-size:20px;font-weight:800}
+
+.info{display:flex;gap:8px;border-bottom:1px dashed #ddd;padding:8px 0}
+.info-main{flex:1;text-align:right}
+.info-main h3{font-size:14px;font-weight:800;display:flex;align-items:center;gap:4px;margin-bottom:4px;justify-content:flex-end}
+.info-main h3 i{background:#ff6600;color:white;padding:2px;border-radius:50%;font-size:9px}
+.info-main p{font-size:10px;color:#555;line-height:1.5}
+.client{border-right:1px solid #eee;padding-right:8px;text-align:center;min-width:55px}
+.avatar{width:40px;height:40px;border-radius:50%;background:#ffe066;display:flex;align-items:center;justify-content:center;font-size:20px;margin:0 auto}
+.client-name{font-weight:800;font-size:11px;margin-top:2px}
+.client-rate{font-weight:700;font-size:11px;display:flex;align-items:center;justify-content:center;gap:2px}
+.client-rate i{color:#ffc107;font-size:10px}
+.client small{font-size:9px;color:#777;display:block;line-height:1.2}
+
+.step{display:none}
+.btn{width:100%;padding:11px;border:none;border-radius:9px;font-family:'Cairo';font-size:14px;font-weight:800;display:flex;justify-content:center;align-items:center;gap:5px;margin:6px 0;color:white}
+.btn i{font-size:15px}
+.btn-orange{background:#ff6600}
+.btn-green{background:#00a651;justify-content:space-between;padding:11px 12px}
+.btn-green.check{width:24px;height:24px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.btn-green.check i{color:#00a651;font-size:12px}
+.btn-blue{background:#007aff;justify-content:space-between;padding:11px 12px}
+.btn-blue.box{width:24px;height:24px;background:white;border-radius:5px;display:flex;align-items:center;justify-content:center}
+.btn-blue.box i{color:#007aff;font-size:12px}
+.suggest{text-align:center;color:#666;font-weight:600;margin:4px 0;font-size:11px}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <i class="fa-solid fa-bars"></i>
+  <div class="center">سهلة <i class="fa-solid fa-motorcycle"></i> للتوصيل</div>
+  <i class="fa-solid fa-arrow-left"></i>
+</div>
+
+<div class="map">
+  <div class="badge badge-green">15 دقيقة<br>11,6 كم</div>
+  <div class="badge badge-blue">4 دقيقة<br>1,0 كم</div>
+</div>
+
+<div class="card">
+  <div class="top">
+    <div class="tag"><i class="fa-solid fa-motorcycle"></i> طلب توصيل</div>
+    <div class="price">
+      <div class="km"><i class="fa-regular fa-clock"></i> 1,0 كم</div>
+      <div class="amount"><span id="orderPrice">40</span> جنيه</div>
+    </div>
+  </div>
+
+  <div class="info">
+    <div class="info-main">
+      <h3>مطعم الشيف حسن <i class="fa-solid fa-utensils"></i></h3>
+      <p>(CJG+RV), المنصورة الجديدة<br>المنصورة الجديدة، محافظة الدقهلية<br>(الساموني)</p>
+    </div>
+    <div class="client">
+      <div class="avatar">😊</div>
+      <div class="client-name">العميل</div>
+      <div class="client-rate"><i class="fa-solid fa-star"></i> 4.93</div>
+      <small>(24)</small>
+      <small>الان</small>
+    </div>
+  </div>
+
+  <div class="step" id="step1" style="display:block">
+    <button class="btn btn-orange" onclick="goStep(2)"><i class="fa-solid fa-motorcycle"></i> القبول مقابل <span id="btnPrice">40</span> جنيه</button>
+    <div class="suggest">اقترح أجرك</div>
+  </div>
+  <div class="step" id="step2">
+    <button class="btn btn-green" onclick="goStep(3)"><i class="fa-solid fa-motorcycle"></i> استلمت الطلب <div class="check"><i class="fa-solid fa-check"></i></div></button>
+  </div>
+  <div class="step" id="step3">
+    <button class="btn btn-orange" onclick="goStep(4)"><i class="fa-solid fa-location-arrow"></i> الاتجاه الى العميل</button>
+  </div>
+  <div class="step" id="step4">
+    <button class="btn btn-blue" onclick="finish()"><i class="fa-solid fa-box"></i> تم تسليم الطلب <div class="box"><i class="fa-solid fa-check"></i></div></button>
+  </div>
+</div>
+
+<script>
+var orderAmount = 40;
+var commissionRate = 0.15;
+
+document.getElementById('btnPrice').innerText = orderAmount;
+document.getElementById('orderPrice').innerText = orderAmount;
+
+function goStep(n){
+  for(let i=1;i<=4;i++){ document.getElementById('step'+i).style.display='none'; }
+  document.getElementById('step'+n).style.display='block';
+}
+
+function finish(){
+  function gC(n){let d=document.cookie.split(';');for(let i=0;i<d.length;i++){let c=d[i];while(c.charAt(0)==' ')c=c.substring(1);if(c.indexOf(n+'=')==0)return c.substring(n.length+1,c.length)}return 50}
+  function sC(n,v){document.cookie=n+"="+v+";path=/;max-age=31536000"}
+  var balance=parseFloat(gC("balance"));
+  var commission = orderAmount * commissionRate;
+  balance = balance - commission; if(balance<0) balance=0; sC("balance",balance);
+  alert("تم تسليم الطلب ✓\nالعمولة 15%: "+commission.toFixed(2)+" جنيه\nرصيدك: "+balance.toFixed(2)+" جنيه");
+  location.href='home.html';
+}
+</script>
+</body>
+  </html>
