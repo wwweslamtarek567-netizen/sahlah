@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>سهلة للتوصيل</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Cairo',sans-serif;background:#f0f0f0}
+.header{background:#ff6600;color:white;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100}
+.header.center{flex:1;text-align:center;font-size:16px;font-weight:800}
+.header i{font-size:20px;color:white}
+.map{position:relative;height:32vh;background:url('map-bg.png') center/cover no-repeat}
+.card{background:white;margin:-12px 10px 10px 10px;border-radius:14px;padding:12px;box-shadow:0 2px 5px rgba(0,0,0,0.1)}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.tag{background:#ff6600;color:white;padding:6px 10px;border-radius:14px;font-weight:700;font-size:12px;display:flex;align-items:center;gap:4px}
+.price{text-align:left}
+.price.km{font-size:12px;color:#666;display:flex;align-items:center;gap:3px;justify-content:flex-end}
+.price.km i{color:#ff6600}
+.price.amount{font-size:20px;font-weight:800}
+.info{display:flex;gap:10px;border-bottom:1px dashed #ddd;padding:10px 0}
+.info-main{flex:1;text-align:right}
+.info-main h3{font-size:15px;font-weight:800;display:flex;align-items:center;gap:4px;margin-bottom:5px;justify-content:flex-end}
+.info-main h3 i{color:#ff6600}
+.info-main p{font-size:11px;color:#555;line-height:1.6}
+.client{border-right:1px solid #eee;padding-right:10px;text-align:center;min-width:55px}
+.avatar{width:40px;height:40px;border-radius:50%;background:#ffe066;display:flex;align-items:center;justify-content:center;font-size:20px;margin:0 auto}
+.client-name{font-weight:800;font-size:11px;margin-top:3px}
+.client-rate{font-weight:700;font-size:11px;display:flex;align-items:center;justify-content:center;gap:2px}
+.client-rate i{color:#ffc107;font-size:10px}
+.client small{font-size:9px;color:#777;display:block}
+.step{display:none}
+.btn{width:100%;padding:12px;border:none;border-radius:10px;font-family:'Cairo';font-size:14px;font-weight:800;display:flex;justify-content:center;align-items:center;gap:6px;margin:8px 0;color:white;cursor:pointer}
+.btn i{font-size:15px}
+.btn-orange{background:#ff6600}
+.btn-red{background:#dc3545}
+.btn-blue{background:#007aff}
+.btn-green{background:#00a651}
+.suggest{text-align:center;color:#666;font-weight:600;margin:5px 0;font-size:12px}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <i class="fa-solid fa-arrow-left"></i>
+  <div class="center">سهلة <i class="fa-solid fa-motorcycle"></i> للتوصيل</div>
+  <i class="fa-solid fa-bars"></i>
+</div>
+
+<div class="map"></div>
+
+<div class="card">
+  <div class="top">
+    <div class="price">
+      <div class="km"><i class="fa-regular fa-clock"></i> 1,0 كم</div>
+      <div class="amount"><span id="orderPrice">40</span> جنيه</div>
+    </div>
+    <div class="tag"><i class="fa-solid fa-motorcycle"></i> طلب توصيل</div>
+  </div>
+
+  <div class="info">
+    <div class="client">
+      <div class="avatar">😊</div>
+      <div class="client-name">العميل</div>
+      <div class="client-rate"><i class="fa-solid fa-star"></i> 4.93</div>
+      <small>(24)</small>
+      <small>الان</small>
+    </div>
+    <div class="info-main">
+      <h3><i class="fa-solid fa-utensils"></i> مطعم الشيف حسن</h3>
+      <p>(CJG+RV), المنصورة الجديدة<br>المنصورة الجديدة، محافظة الدقهلية<br>(الساموني)</p>
+    </div>
+  </div>
+
+  <div class="step" id="step1" style="display:block">
+    <button class="btn btn-orange" onclick="openGoogleMaps('A')"><i class="fa-solid fa-motorcycle"></i> القبول مقابل <span id="btnPrice">40</span> جنيه</button>
+    <div class="suggest">اقترح أجرك</div>
+  </div>
+  <div class="step" id="step2">
+    <button class="btn btn-red" onclick="pickedOrder()"><i class="fa-solid fa-motorcycle"></i> استلمت الطلب</button>
+  </div>
+  <div class="step" id="step3">
+    <button class="btn btn-blue" onclick="openGoogleMaps('B')"><i class="fa-solid fa-location-arrow"></i> الاتجاه الى العميل</button>
+  </div>
+  <div class="step" id="step4">
+    <button class="btn btn-green" onclick="finishOrder()"><i class="fa-solid fa-box"></i> تم تسليم الطلب</button>
+  </div>
+</div>
+
+<script>
+var orderAmount = 40;
+var commissionRate = 0.15;
+var locationA = "31.0414,31.3785"; // المطعم
+var locationB = "31.0500,31.3900"; // العميل
+
+document.getElementById('btnPrice').innerText = orderAmount;
+document.getElementById('orderPrice').innerText = orderAmount;
+
+function goStep(n){
+  for(let i=1;i<=4;i++){ document.getElementById('step'+i).style.display='none'; }
+  document.getElementById('step'+n).style.display='block';
+}
+
+function openGoogleMaps(point){
+  if(point == 'A'){
+    var url = "https://www.google.com/maps/dir/?api=1&destination=" + locationA + "&travelmode=driving";
+  } else {
+    var url = "https://www.google.com/maps/dir/?api=1&destination=" + locationB + "&travelmode=driving";
+  }
+  window.open(url, '_blank');
+  if(point == 'A') goStep(2);
+  if(point == 'B') goStep(4);
+}
+
+function pickedOrder(){
+  goStep(3);
+}
+
+// دي اهم حاجة - بنخصم من نفس localStorage بتاع home.html
+function finishOrder(){
+  // 1. نجيب الرصيد من localStorage
+  var balance = parseFloat(localStorage.getItem('balance'));
+  
+  // 2. نحسب العمولة 15% من 40 = 6 جنيه
+  var deduct = orderAmount * commissionRate;
+  
+  // 3. نخصم
+  balance = balance - deduct;
+  if(balance < 0) balance = 0;
+  
+  // 4. نخزن الجديد
+  localStorage.setItem('balance', balance.toFixed(2));
+
+  alert("✓ تم تسليم الطلب\n\nسعر الطلب: " + orderAmount + " جنيه\nالعمولة 15%: " + deduct.toFixed(2) + " جنيه\nرصيدك الحالي: " + balance.toFixed(2) + " جنيه");
+  
+  // 5. نرجع للرئيسية وهي هتقرا الرصيد الجديد تلقائي
+  location.href='home.html';
+}
+</script>
+</body>
+  </html>
