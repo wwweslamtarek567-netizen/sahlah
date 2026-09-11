@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>موقعك الحالي</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
+
+<style>
+body{margin:0;font-family:'Cairo',sans-serif;background:#f5f5f5;}
+.header{background:#ff6a00;color:white;padding:15px;text-align:center;font-size:18px;font-weight:700;position:fixed;top:0;left:0;right:0;z-index:1000;}
+#map{height:100vh;width:100%;padding-top:55px;}
+.btns{position:fixed;bottom:80px;left:10px;right:10px;display:flex;gap:10px;z-index:1000;}
+.btn{flex:1;background:#ff6a00;color:white;padding:14px;text-align:center;border-radius:15px;border:none;font-weight:700;font-size:15px;font-family:'Cairo';}
+.btn:active{background:#e55a00;}
+.back-btn{position:fixed;bottom:15px;left:50%;transform:translateX(-50%);background:#333;color:white;padding:12px 30px;border-radius:25px;text-decoration:none;font-weight:700;z-index:1000;}
+.status{position:fixed;bottom:140px;left:10px;right:10px;background:white;padding:12px;border-radius:15px;text-align:center;box-shadow:0 4px 15px rgba(0,0,0,0.2);z-index:1000;font-size:14px;}
+.leaflet-routing-container{display:none!important;} /* نخفي الكلام الكتير */
+</style>
+</head>
+<body>
+
+<div class="header">📍 موقعك الحالي</div>
+<div id="map"></div>
+<div class="status" id="status">جاري تحديد الموقع...</div>
+
+<div class="btns">
+  <button class="btn" onclick="getCurrentLocation()">📍 موقعي الحالي</button>
+  <button class="btn" onclick="getDirections()">🧭 تحديد الاتجاهات</button>
+</div>
+
+<a href="home.html" class="back-btn">رجوع للرئيسية</a>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+<script>
+var map = L.map('map').setView([31.2628, 31.3748], 14); // جمصة
+var marker, routingControl;
+var userLat, userLng;
+
+// الخريطة
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap'
+}).addTo(map);
+
+// زرار 1: موقعي الحالي
+function getCurrentLocation(){
+  document.getElementById("status").innerHTML = "جاري تحديد الموقع...";
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function(pos){
+      userLat = pos.coords.latitude;
+      userLng = pos.coords.longitude;
+      map.setView([userLat, userLng], 16);
+
+      if(marker) map.removeLayer(marker);
+      marker = L.marker([userLat, userLng]).addTo(map)
+      .bindPopup("انت هنا").openPopup();
+
+      document.getElementById("status").innerHTML = "تم تحديد الموقع";
+    }, function(){
+      document.getElementById("status").innerHTML = "فعل الـ GPS";
+    });
+  }
+}
+
+// زرار 2: تحديد الاتجاهات
+function getDirections(){
+  if(!userLat){
+    alert("لازم تدوس موقعي الحالي الاول");
+    getCurrentLocation();
+    return;
+  }
+  document.getElementById("status").innerHTML = "جاري رسم الطريق...";
+
+  // غير الاحداثيات دي للمكان اللي عايز تروحله
+  var destination = [31.2660, 31.3740]; // مثال: الكورنيش جمصة
+
+  if(routingControl) map.removeControl(routingControl);
+
+  routingControl = L.Routing.control({
+    waypoints: [
+      L.latLng(userLat, userLng),
+      L.latLng(destination[0], destination[1])
+    ],
+    routeWhileDragging: false,
+    language: 'ar',
+    addWaypoints: false,
+    showAlternatives: false
+  }).addTo(map);
+
+  document.getElementById("status").innerHTML = "الطريق اترسم بالازرق";
+}
+
+getCurrentLocation(); // يشتغل تلقائي
+</script>
+
+</body>
+  </html>
