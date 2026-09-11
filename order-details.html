@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>تفاصيل الطلب</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:'Cairo',sans-serif;background:#f0f0f0;overflow-x:hidden}
+.header{background:#ff6a00;color:white;padding:15px 20px;display:flex;justify-content:space-between;align-items:center;border-bottom-left-radius:25px;border-bottom-right-radius:25px;position:sticky;top:0;z-index:999}
+.header i{font-size:22px;cursor:pointer}
+.header.logo{text-align:center;font-size:24px;font-weight:800}
+.header.logo span{font-size:14px;font-weight:400;display:block}
+
+.map-container{position:relative;height:40vh;width:100%;background:#a8d5ff}
+.map-badge{position:absolute;z-index:10;padding:10px 15px;border-radius:18px;font-weight:800;font-size:14px;color:white;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.2)}
+.badge-a{top:15px;right:15px;background:#007bff}
+.badge-b{top:15px;left:15px;background:#28a745}
+.map-line{position:absolute;bottom:20%;left:10%;right:10%;height:5px;background:#28a745;border-radius:5px;z-index:5}
+.map-point-a{position:absolute;bottom:18%;right:12%;width:45px;height:45px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;border:4px solid #ff6a00;z-index:6}
+.map-point-b{position:absolute;bottom:18%;left:12%;width:35px;height:35px;background:#28a745;border-radius:50%;color:white;display:flex;align-items:center;justify-content:center;font-weight:800;z-index:6}
+
+.card{background:white;margin:-25px 15px 15px 15px;padding:15px;border-radius:20px;box-shadow:0 4px 20px rgba(0,0,0,0.1);position:relative;z-index:100}
+.top-row{display:flex;justify-content:space-between;align-items:start;margin-bottom:15px}
+.tag{background:#ff6a00;color:white;padding:10px 15px;border-radius:25px;display:flex;align-items:center;gap:8px;font-weight:800;font-size:14px}
+.price{text-align:left}
+.price.km{font-size:13px;color:#666;display:flex;align-items:center;gap:5px;justify-content:flex-end}
+.price.amount{font-size:32px;font-weight:800;color:#222}
+
+.info{display:flex;gap:15px;border-bottom:1px dashed #ddd;padding-bottom:15px;margin-bottom:15px}
+.info-main{flex:1}
+.info-main h3{margin:5px 0;font-size:18px;display:flex;align-items:center;gap:8px;font-weight:800}
+.info-main p{margin:5px 0;color:#555;font-size:13px;line-height:1.6}
+.client{text-align:center;border-right:1px solid #eee;padding-right:15px;min-width:80px}
+.client img{width:60px;height:60px;border-radius:50%;background:#e0e0e0}
+.client.name{font-weight:800;font-size:14px;margin-top:5px}
+.client.rate{color:#ffc107;font-weight:800;font-size:14px}
+.client.rate i{font-size:12px}
+
+.btn{width:100%;padding:16px;border:none;border-radius:15px;font-family:'Cairo';font-size:17px;font-weight:800;display:flex;justify-content:center;align-items:center;gap:10px;margin:10px 0;cursor:pointer;color:white}
+.btn i{font-size:20px}
+.btn-orange{background:#ff6a00}
+.btn-green{background:#28a745;justify-content:space-between}
+.btn-blue{background:#007bff;justify-content:space-between}
+.suggest{text-align:center;margin:10px 0;font-weight:700;font-size:15px;color:#666}
+.step{display:none}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <i class="fa-solid fa-arrow-right" onclick="history.back()"></i>
+  <div class="logo">سهلة <i class="fa-solid fa-motorcycle"></i><span>للتوصيل</span></div>
+  <i class="fa-solid fa-bars"></i>
+</div>
+
+<div class="map-container">
+  <div class="map-badge badge-a">4 دقيقة<br>1,0 كم</div>
+  <div class="map-badge badge-b">15 دقيقة<br>11,6 كم</div>
+  <div class="map-line"></div>
+  <div class="map-point-a"><i class="fa-solid fa-motorcycle" style="color:#ff6a00;font-size:22px"></i></div>
+  <div class="map-point-b">B</div>
+</div>
+
+<div class="card">
+  <div class="top-row">
+    <div class="tag"><i class="fa-solid fa-motorcycle"></i> طلب توصيل</div>
+    <div class="price">
+      <div class="km"><i class="fa-regular fa-clock"></i> 1,0 كم</div>
+      <div class="amount">40 جنيه</div>
+    </div>
+  </div>
+
+  <div class="info">
+    <div class="info-main">
+      <h3>مطعم الشيف حسن <i class="fa-solid fa-utensils" style="color:#ff6a00;"></i></h3>
+      <p>CJG+RV). المنصورة الجديدة<br>المنصورة الجديدة، محافظة الدقهلية<br>(الساموني)</p>
+    </div>
+    <div class="client">
+      <img src="https://ui-avatars.com/api/?name=العميل&background=E0E0E0&color=333&size=128">
+      <div class="name">العميل</div>
+      <div class="rate">4.93 <i class="fa-solid fa-star"></i></div>
+      <div style="font-size:12px;color:#666;">(24)<br>الآن</div>
+    </div>
+  </div>
+
+  <!-- الزراير بالخطوات -->
+  <div class="step" id="step1" style="display:block">
+    <button class="btn btn-orange" onclick="goStep(2)"><i class="fa-solid fa-motorcycle"></i> القبول مقابل 40 جنيه</button>
+    <div class="suggest">اقترح أجرك</div>
+  </div>
+
+  <div class="step" id="step2">
+    <button class="btn btn-green" onclick="goStep(3)">استلمت الطلب <i class="fa-solid fa-circle-check"></i></button>
+  </div>
+
+  <div class="step" id="step3">
+    <button class="btn btn-orange" onclick="goStep(4)"><i class="fa-solid fa-location-arrow"></i> الاتجاه الى العميل</button>
+  </div>
+
+  <div class="step" id="step4">
+    <button class="btn btn-blue" onclick="finish()"><i class="fa-solid fa-box"></i> تم تسليم الطلب</button>
+  </div>
+
+</div>
+
+<script>
+// دالة التنقل بين الخطوات - بتشتغل في التطبيق
+function goStep(n){
+  document.getElementById('step1').style.display='none';
+  document.getElementById('step2').style.display='none';
+  document.getElementById('step3').style.display='none';
+  document.getElementById('step4').style.display='none';
+  document.getElementById('step'+n).style.display='block';
+
+  // فتح الخريطة
+  if(n==2){ window.open("https://www.google.com/maps/dir/?api=1&destination=31.0422,31.3787","_system"); }
+  if(n==4){ window.open("https://www.google.com/maps/dir/?api=1&destination=31.0409,31.3756","_system"); }
+}
+
+// دالة الخصم
+function finish(){
+  function gC(n){let d=document.cookie.split(';');for(let i=0;i<d.length;i++){let c=d[i];while(c.charAt(0)==' ')c=c.substring(1);if(c.indexOf(n+'=')==0)return c.substring(n.length+1,c.length)}return 50}
+  function sC(n,v){document.cookie=n+"="+v+";path=/;max-age=31536000"}
+  var balance=parseFloat(gC("balance"));
+  let d=6; balance=balance-d; if(balance<0) balance=0; sC("balance",balance);
+  alert("تم تسليم الطلب بنجاح\nتم خصم 6 جنيه\nرصيدك: "+balance.toFixed(2)+" جنيه");
+  location.href='home.html';
+}
+</script>
+</body>
+  </html>
