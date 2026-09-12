@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head><meta charset="UTF-8"><title>تسجيل دخول</title>
+<script>
+// اول ما الصفحة تفتح
+if(localStorage.getItem('riderId')){
+    // لو مسجل قبل كده خش الرئيسية على طول
+    window.location.href = "home.html";
+} else {
+    // لو مش مسجل روح سجل
+    window.location.href = "index.html";
+}
+</script>
+</head>
+<body>جاري التحويل...</body>
+</html>
