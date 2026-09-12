@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الرئيسية - سهلة</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+body{margin:0;font-family:'Cairo',sans-serif;background:#f7f7f7;padding-bottom:80px;}
+.banner-header img{width:100%;display:block;}
+.status-card{background:#e8f5e9;margin:15px;border-radius:15px;padding:15px;display:flex;justify-content:space-between;align-items:center;transition:0.3s;}
+.status-card.off{background:#ffebee;}
+.status-info h3{margin:0;font-size:18px;font-weight:800;display:flex;align-items:center;gap:8px;}
+.status-info p{margin:5px 0 0 0;color:#666;font-size:13px;}
+.dot{width:12px;height:12px;border-radius:50%;background:#4caf50;}
+.dot.off{background:#f44336;}
+.switch{position:relative;display:inline-block;width:50px;height:28px;}
+.switch input{opacity:0;width:0;height:0;}
+.slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#ccc;transition:.4s;border-radius:28px;}
+.slider:before{position:absolute;content:"";height:22px;width:22px;left:3px;bottom:3px;background:white;transition:.4s;border-radius:50%;}
+input:checked + .slider{background:#4caf50;}
+input:checked + .slider:before{transform:translateX(22px);}
+input:disabled + .slider{background:#ddd;cursor:not-allowed;}
+.balance-card{background:linear-gradient(135deg, #ff6a00 0%, #ff8533 100%);color:white;margin:15px;border-radius:20px;padding:20px;position:relative;overflow:hidden;}
+.balance-card::after{content:'';position:absolute;top:-50px;right:-50px;width:200px;height:200px;background:rgba(255,255,255,0.1);border-radius:50%;}
+.balance-card h4{margin:0;font-weight:400;font-size:15px;position:relative;z-index:1;}
+.balance-card .amount{text-align:left;font-size:45px;font-weight:800;margin:10px 0;position:relative;z-index:1;}
+.balance-card .amount span{font-size:20px;}
+.balance-footer{display:flex;justify-content:space-between;font-size:13px;margin-top:15px;position:relative;z-index:1;}
+.balance-footer a{color:white;text-decoration:none;}
+.alert{background:#fff3cd;color:#856404;padding:12px;border-radius:10px;margin:15px;text-align:center;font-weight:700;cursor:pointer;}
+.shortcuts{display:flex;justify-content:space-around;margin:20px 15px;}
+.shortcut{text-align:center;background:white;padding:15px;border-radius:15px;width:28%;box-shadow:0 2px 8px rgba(0,0,0,0.05);cursor:pointer;}
+.shortcut .icon{width:50px;height:50px;border-radius:50%;margin:0 auto 8px;display:flex;align-items:center;justify-content:center;font-size:24px;}
+.icon-help{background:#fff3e0;color:#ff6a00;}
+.icon-msg{background:#e3f2fd;color:#2196f3;}
+.icon-box{background:#f3e5f5;color:#9c27b0;}
+.shortcut div{font-weight:700;font-size:14px;color:#333;}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:white;display:flex;justify-content:space-around;padding:10px 0;box-shadow:0 -2px 10px rgba(0,0,0,0.05);}
+.nav-item{text-align:center;color:#999;font-size:12px;text-decoration:none;}
+.nav-item.active{color:#ff6a00;font-weight:700;}
+.nav-item i{font-size:22px;display:block;margin-bottom:3px;}
+</style>
+</head>
+<body>
+
+<div class="banner-header">
+  <img src="header.png" alt="سهلة للتوصيل">
+</div>
+
+<div id="rechargeAlert" class="alert" style="display:none" onclick="window.location='profile.html'">
+  ⚠️ رصيدك صفر - اذهب للشحن
+</div>
+
+<div class="status-card" id="statusCard">
+  <div class="status-info">
+    <h3><span class="dot" id="statusDot"></span><span id="statusText">متاح لاستلام طلبات</span></h3>
+    <p id="statusSub">طلبات جديدة ممكن توصلك دلوقتي</p>
+  </div>
+  <label class="switch">
+    <input type="checkbox" id="statusToggle" onchange="toggleStatus()">
+    <span class="slider"></span>
+  </label>
+</div>
+
+<div class="balance-card">
+  <h4>الرصيد الحالي</h4>
+  <div class="amount"><span id="balance">0.00</span> <span>جنيه</span></div>
+  <div class="balance-footer">
+    <a href="profile.html">تفاصيل ></a>
+    <span id="lastUpdate">آخر تحديث منذ 4 دقائق</span>
+  </div>
+</div>
+
+<div style="text-align:right;font-size:18px;font-weight:800;margin:15px;">اختصاراتك</div>
+<div class="shortcuts">
+  <div class="shortcut" onclick="window.location='orders.html'"><div class="icon icon-box"><i class="fa-solid fa-box"></i></div><div>طلباتي</div></div>
+  <div class="shortcut"><div class="icon icon-msg"><i class="fa-regular fa-envelope"></i></div><div>ملخص</div></div>
+  <div class="shortcut"><div class="icon icon-help"><i class="fa-solid fa-question"></i></div><div>مساعدة</div></div>
+</div>
+
+<div class="bottom-nav">
+  <a href="home.html" class="nav-item active"><i class="fa-solid fa-house"></i>الرئيسية</a>
+  <a href="map.html" class="nav-item"><i class="fa-solid fa-location-dot"></i>الموقع</a>
+  <a href="orders.html" class="nav-item"><i class="fa-regular fa-file-lines"></i>الطلبات</a>
+  <a href="profile.html" class="nav-item"><i class="fa-solid fa-user"></i>حسابي</a>
+</div>
+
+<script>
+var riderId = localStorage.getItem('riderId');
+if(!riderId){ window.location = 'login.html'; }
+
+// دالة نجيب بيها الرصيد والحالة من التخزين كل مرة
+function getBalance(){
+  return parseFloat(localStorage.getItem('balance_' + riderId)) || 0;
+}
+function getAvailability(){
+  return localStorage.getItem('isAvailable_' + riderId) === 'true';
+}
+
+// بونص 50ج اول مرة بس
+if(localStorage.getItem('balance_' + riderId) === null){
+  localStorage.setItem('balance_' + riderId, 50);
+  localStorage.setItem('isAvailable_' + riderId, 'true');
+}
+
+function updateUI(){
+  var balance = getBalance(); // نجيبه جديد كل مرة
+  var isAvailable = getAvailability();
+  
+  document.getElementById('balance').innerText = balance.toFixed(2);
+  document.getElementById('statusToggle').checked = isAvailable;
+  document.getElementById('lastUpdate').innerText = 'آخر تحديث منذ لحظات';
+  
+  if(balance <= 0){
+    localStorage.setItem('isAvailable_' + riderId, 'false');
+    document.getElementById('statusToggle').checked = false;
+    document.getElementById('statusToggle').disabled = true;
+    document.getElementById('statusCard').classList.add('off');
+    document.getElementById('statusDot').classList.add('off');
+    document.getElementById('statusText').innerText = 'غير متاح لاستلام الطلبات';
+    document.getElementById('statusSub').innerText = 'رصيدك صفر. اشحن لاستلام طلبات';
+    document.getElementById('rechargeAlert').style.display = 'block';
+  } else {
+    document.getElementById('statusToggle').disabled = false;
+    document.getElementById('rechargeAlert').style.display = 'none';
+    if(isAvailable){
+      document.getElementById('statusCard').classList.remove('off');
+      document.getElementById('statusDot').classList.remove('off');
+      document.getElementById('statusText').innerText = 'متاح لاستلام طلبات';
+      document.getElementById('statusSub').innerText = 'طلبات جديدة ممكن توصلك دلوقتي';
+    } else {
+      document.getElementById('statusCard').classList.add('off');
+      document.getElementById('statusDot').classList.add('off');
+      document.getElementById('statusText').innerText = 'غير متاح لاستلام الطلبات';
+      document.getElementById('statusSub').innerText = 'فعل الزرار لاستقبال طلبات جديدة';
+    }
+  }
+}
+
+function toggleStatus(){
+  let toggle = document.getElementById('statusToggle');
+  var balance = getBalance();
+  if(balance <= 0 && toggle.checked){
+    toggle.checked = false;
+    alert('رصيدك صفر. برجاء الشحن اولاً');
+    return;
+  }
+  localStorage.setItem('isAvailable_' + riderId, toggle.checked ? 'true' : 'false');
+  updateUI();
+}
+
+// دي اللي هتناديها في زرار "تم التسليم"
+function deductCommission(orderCommission){
+  var balance = getBalance();
+  var deduct = orderCommission * 0.15; 
+  balance = balance - deduct;
+  if(balance < 0) balance = 0;
+  localStorage.setItem('balance_' + riderId, balance.toFixed(2));
+  
+  updateUI(); // نحدث الكارت
+  
+  // نفس شكل الرسالة اللي في الصورة
+  alert('✓ تم تسليم الطلب بنجاح\n\nتم خصم ' + deduct.toFixed(2) + ' جنيه عمولة\nرصيدك الحالي: ' + balance.toFixed(2) + ' جنيه');
+}
+
+// مهم جدا: يتحدث اول ما تفتح واول ما ترجع للصفحة
+window.onload = updateUI;
+window.onfocus = updateUI; // ده اللي بيخلي الكارت يتحدث لما ترجع
+</script>
+</body>
+  </html>
