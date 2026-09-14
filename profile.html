@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>حسابي - سهلة</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+*{box-sizing:border-box;}
+body{margin:0;font-family:'Cairo',sans-serif;background:#f5f5f5;padding-bottom:75px;}
+.header{background:linear-gradient(135deg, #ff6a00 0%, #ff7b25 100%);padding:0;border-radius:0 0 25px 25px;color:white;position:relative;overflow:hidden;}
+.header-banner{width:100%;display:block;} /* الصورة هتملا العرض كله */
+.header h1{position:absolute;top:15px;right:16px;font-size:26px;font-weight:800;margin:0;}
+
+.profile-card{background:white;margin:-25px 16px 12px;border-radius:16px;padding:16px;display:flex;align-items:flex-start;gap:14px;box-shadow:0 2px 10px rgba(0,0,0,0.06);}
+.profile-card img{width:70px;height:70px;border-radius:50%;border:3px solid #ff6a00;object-fit:cover;flex-shrink:0;}
+.profile-info{flex:1;}
+.profile-info h3{margin:0 0 6px 0;font-size:19px;font-weight:800;color:#222;}
+.profile-info .badge{background:#fff3e0;color:#ff6a00;padding:5px 10px;border-radius:20px;font-size:12px;font-weight:700;display:inline-flex;align-items:center;gap:5px;margin-bottom:6px;}
+.profile-info p{margin:0;color:#555;font-size:14px;display:flex;align-items:center;gap:6px;font-weight:600;direction:ltr;} /* ltr عشان الرقم */
+.profile-card .fa-chevron-left{color:#bbb;font-size:13px;margin-top:5px;}
+
+.menu-item{background:white;margin:0 16px 10px;border-radius:14px;padding:16px 14px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;}
+.menu-left{display:flex;align-items:center;gap:12px;font-size:15.5px;font-weight:700;color:#333;}
+.menu-icon{width:42px;height:42px;background:#fff3e0;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#ff6a00;font-size:19px;}
+.menu-item .fa-chevron-left{color:#ccc;font-size:14px;}
+
+.btn-logout{background:white;border:1.5px solid #ff6a00;color:#ff6a00;margin:18px 16px 0;padding:14px;border-radius:12px;width:calc(100% - 32px);font-size:15.5px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;font-family:'Cairo';}
+
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:white;display:flex;justify-content:space-around;padding:6px 0 8px;box-shadow:0 -1px 8px rgba(0,0,0,0.06);border-top:1px solid #f0f0f0;}
+.nav-item{text-align:center;color:#8a8a8a;font-size:11px;text-decoration:none;font-weight:600;}
+.nav-item.active{color:#ff6a00;font-weight:700;}
+.nav-item i{font-size:20px;display:block;margin-bottom:4px;}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <img src="header-profile.png" class="header-banner" alt="سهلة"> <!-- الصورة هتملا الكدر -->
+  <h1>حسابي</h1>
+</div>
+
+<div class="profile-card">
+  <img src="rider.png" alt="مندوب" id="riderImg">
+  <div class="profile-info">
+    <h3 id="riderName"></h3> <!-- فاضي عشان يتملى من localStorage -->
+    <div class="badge"><i class="fa-solid fa-user"></i> مندوب توصيل</div>
+    <p><span id="riderPhone"></span> <i class="fa-solid fa-phone" style="color:#ff6a00;font-size:12px;"></i></p> <!-- الرقم تحت الاسم -->
+  </div>
+  <i class="fa-solid fa-chevron-left"></i>
+</div>
+
+<div class="menu-item">
+  <div class="menu-left">
+    <div class="menu-icon"><i class="fa-regular fa-user"></i></div>
+    <span>البيانات الشخصيه</span>
+  </div>
+  <i class="fa-solid fa-chevron-left"></i>
+</div>
+
+<div class="menu-item" onclick="window.location='orders.html'">
+  <div class="menu-left">
+    <div class="menu-icon"><i class="fa-regular fa-file-lines"></i></div>
+    <span>سجل الطلبات</span>
+  </div>
+  <i class="fa-solid fa-chevron-left"></i>
+</div>
+
+<div class="menu-item">
+  <div class="menu-left">
+    <div class="menu-icon"><i class="fa-solid fa-coins"></i></div>
+    <span>الارباح</span>
+  </div>
+  <i class="fa-solid fa-chevron-left"></i>
+</div>
+
+<div class="menu-item">
+  <div class="menu-left">
+    <div class="menu-icon"><i class="fa-regular fa-wallet"></i></div>
+    <span>طريقه الدفع</span>
+  </div>
+  <i class="fa-solid fa-chevron-left"></i>
+</div>
+
+<div class="menu-item">
+  <div class="menu-left">
+    <div class="menu-icon"><i class="fa-solid fa-headset"></i></div>
+    <span>مساعده ودعم</span>
+  </div>
+  <i class="fa-solid fa-chevron-left"></i>
+</div>
+
+<div class="menu-item">
+  <div class="menu-left">
+    <div class="menu-icon"><i class="fa-solid fa-gear"></i></div>
+    <span>الإعدادات</span>
+  </div>
+  <i class="fa-solid fa-chevron-left"></i>
+</div>
+
+<button class="btn-logout" onclick="logout()">
+  <i class="fa-solid fa-right-from-bracket"></i> تسجيل الخروج
+</button>
+
+<div class="bottom-nav">
+  <a href="index.html" class="nav-item"><i class="fa-solid fa-house"></i>الرئيسية</a>
+  <a href="map.html" class="nav-item"><i class="fa-solid fa-location-dot"></i>الموقع</a>
+  <a href="orders.html" class="nav-item"><i class="fa-regular fa-file-lines"></i>الطلبات</a>
+  <a href="profile.html" class="nav-item active"><i class="fa-solid fa-user"></i>حسابي</a>
+</div>
+
+<script>
+var riderId = localStorage.getItem('riderId');
+if(!riderId){ window.location = 'login.html'; } // 4. لو مش مسجل يروح للوجن
+
+function updateProfile(){
+  // 2 و 3. الاسم والرقم بيجو متغيرين من التخزين
+  document.getElementById('riderName').innerText = localStorage.getItem('riderName_' + riderId) || 'اسم المندوب';
+  document.getElementById('riderPhone').innerText = localStorage.getItem('riderPhone_' + riderId) || '';
+}
+
+function logout(){
+  if(confirm('متأكد انك عايز تسجل الخروج؟')){
+    localStorage.removeItem('riderId');
+    window.location = 'login.html';
+  }
+}
+
+window.onload = updateProfile;
+</script>
+</body>
+  </html>
