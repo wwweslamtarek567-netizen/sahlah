@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>حسابي - سهلة</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Cairo',sans-serif;background:#f2f2f2;padding-bottom:70px;}
+
+/* الهيدر باستخدام logo-white.png */
+.header{height:140px;border-radius:0 0 30px 30px;position:relative;overflow:hidden;}
+.header-bg{width:100%;height:100%;object-fit:cover;}
+.header h1{font-size:23px;font-weight:800;position:absolute;right:18px;top:15px;color:white;}
+
+/* كارت البروفايل */
+.profile-card{background:white;margin:-30px 12px 12px;border-radius:16px;padding:18px 16px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 8px rgba(0,0,0,0.05);}
+.back-btn{color:#ccc;font-size:18px;}
+.profile-center{text-align:center;flex:1;}
+.badge{background:#fff3e0;color:#ff6a00;padding:6px 14px;border-radius:20px;font-size:13px;font-weight:700;display:inline-flex;align-items:center;gap:6px;margin-bottom:10px;}
+.phone-icon{color:#ff6a00;font-size:20px;}
+.avatar-box{text-align:center;}
+.avatar-label{font-size:13px;color:#333;font-weight:700;margin-bottom:4px;}
+.avatar{width:65px;height:65px;border-radius:50%;object-fit:cover;border:2px solid #ff6a00;} /* عملتها دايرة زي rider.png */
+
+/* عناصر القائمة */
+.menu{background:white;margin:0 12px 10px;border-radius:14px;padding:16px 15px;display:flex;justify-content:space-between;align-items:center;}
+.menu-right{display:flex;align-items:center;gap:12px;font-size:15.5px;font-weight:700;color:#222;}
+.icon-box{width:42px;height:42px;background:#fff3e0;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#ff6a00;font-size:20px;}
+.arrow{color:#ccc;font-size:15px;}
+
+/* الفوتر */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:white;display:flex;justify-content:space-around;padding:6px 0 8px;border-top:1px solid #e0e0e0;}
+.nav-item{text-align:center;text-decoration:none;color:#999;font-size:11px;font-weight:600;}
+.nav-item.active{color:#ff6a00;}
+.nav-item i{display:block;font-size:23px;margin-bottom:4px;}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <img src="logo-white.png" class="header-bg" alt="سهلة"> <!-- هنا حطيت اللوجو بتاعك -->
+  <h1>حسابي</h1>
+</div>
+
+<div class="profile-card">
+  <i class="fa-solid fa-chevron-left back-btn"></i>
+  
+  <div class="profile-center">
+    <div class="badge"><i class="fa-regular fa-user"></i> مندوب توصيل</div>
+    <div class="phone-icon"><i class="fa-solid fa-phone"></i> <span id="riderPhone"></span></div>
+  </div>
+  
+  <div class="avatar-box">
+    <div class="avatar-label">صورة<br>المندوب</div>
+    <img src="rider.png" class="avatar" id="riderImg" alt="صورة المندوب"> <!-- هنا صورة المندوب بتاعتك -->
+  </div>
+</div>
+
+<div class="menu">
+  <i class="fa-solid fa-chevron-left arrow"></i>
+  <div class="menu-right">
+    البيانات الشخصيه
+    <div class="icon-box"><i class="fa-regular fa-user"></i></div>
+  </div>
+</div>
+
+<div class="menu" onclick="location='orders.html'">
+  <i class="fa-solid fa-chevron-left arrow"></i>
+  <div class="menu-right">
+    سجل الطلبات
+    <div class="icon-box"><i class="fa-regular fa-file-lines"></i></div>
+  </div>
+</div>
+
+<div class="menu">
+  <i class="fa-solid fa-chevron-left arrow"></i>
+  <div class="menu-right">
+    الارباح
+    <div class="icon-box"><i class="fa-solid fa-coins"></i></div>
+  </div>
+</div>
+
+<div class="menu">
+  <i class="fa-solid fa-chevron-left arrow"></i>
+  <div class="menu-right">
+    طريقه الدفع
+    <div class="icon-box"><i class="fa-regular fa-credit-card"></i></div>
+  </div>
+</div>
+
+<div class="menu">
+  <i class="fa-solid fa-chevron-left arrow"></i>
+  <div class="menu-right">
+    مساعده ودعم
+    <div class="icon-box"><i class="fa-solid fa-headset"></i></div>
+  </div>
+</div>
+
+<div class="bottom-nav">
+  <a href="index.html" class="nav-item"><i class="fa-solid fa-house"></i>الرئيسية</a>
+  <a href="map.html" class="nav-item"><i class="fa-solid fa-location-dot"></i>الموقع</a>
+  <a href="orders.html" class="nav-item"><i class="fa-regular fa-file-lines"></i>الطلبات</a>
+  <a href="profile.html" class="nav-item active"><i class="fa-regular fa-user"></i>حسابي</a>
+</div>
+
+<script>
+// تشييك التسجيل
+var riderId = localStorage.getItem('riderId');
+if(!riderId){ window.location.href = 'login.html'; }
+
+// جلب البيانات
+document.getElementById('riderPhone').innerText = localStorage.getItem('riderPhone_' + riderId) || '';
+var img = localStorage.getItem('riderImg_' + riderId);
+if(img){ document.getElementById('riderImg').src = img; }
+else { document.getElementById('riderImg').src = 'rider.png'; } // الصورة الافتراضية بتاعتك
+</script>
+</body>
+  </html>
