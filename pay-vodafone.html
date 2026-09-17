@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>فودافون كاش</title>
+<style>
+body{margin:0;background:#f5f5f5;font-family:Tajawal,sans-serif}
+.header{background:#e30613;color:#fff;padding:20px;text-align:center;font-size:20px;font-weight:bold}
+.box{background:#fff;margin:20px;border-radius:18px;padding:20px;box-shadow:0 4px 15px #0001;text-align:center}
+.box img{width:80px;height:80px;border-radius:18px;margin-bottom:10px}
+.num{font-size:28px;font-weight:bold;letter-spacing:2px;margin:15px 0;background:#f9f9f9;padding:12px;border-radius:12px;border:2px dashed #e30613}
+.btn{background:#e30613;color:#fff;border:none;padding:14px 0;width:100%;border-radius:12px;font-size:18px;font-weight:bold;cursor:pointer;margin-top:10px}
+.btn2{background:#000;color:#fff;border:none;padding:14px 0;width:100%;border-radius:12px;font-size:16px;margin-top:12px}
+.steps{text-align:right;margin-top:20px;background:#fff9f9;padding:15px;border-radius:12px;font-size:14px;line-height:1.8}
+input{width:100%;padding:12px;margin-top:10px;border-radius:10px;border:1px solid #ddd;box-sizing:border-box}
+</style>
+<script>
+function copyNum(){navigator.clipboard.writeText("01025025973");alert("تم نسخ الرقم: 01025025973");}
+</script>
+</head>
+<body>
+<div class="header">فودافون كاش - Vodafone Cash</div>
+
+<div class="box">
+<img src="vodafone.webp">
+<h2>حول على الرقم ده</h2>
+<div class="num">01025025973</div>
+<button class="btn" onclick="copyNum()">📋 نسخ الرقم</button>
+
+<div class="steps">
+<b>خطوات التحويل:</b><br>
+1- افتح انا فودافون واختار فودافون كاش<br>
+2- دوس تحويل اموال واكتب الرقم اللي فوق<br>
+3- اكتب المبلغ اللي عايز تشحنه<br>
+4- بعد التحويل ارفع سكرين شوت التحويل تحت
+</div>
+
+<input type="text" id="amount" placeholder="اكتب المبلغ اللي حولته مثلا 500">
+<input type="file" accept="image/*">
+<button class="btn2" onclick="alert('تم استلام طلبك يا غالي، هيتم تفعيل الرصيد خلال دقايق')">✅ انا حولت - تأكيد</button>
+<br><br>
+<button onclick="location.href='payment.html'" style="background:none;border:none;color:#888;">‹ رجوع لطرق الدفع</button>
+</div>
+</body>
+  </html>
