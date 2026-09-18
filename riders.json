@@ -1,9 +1,11 @@
 [
   {
     "phone": "01025025973",
-    "balance": 32,
+    "balance": 82,
     "delivered": 1,
     "cancelled": 0,
-    "name": "شهد رضا "
+    "name": "شهد رضا ",
+    "status": "متاح",
+    "orders": 0
   }
 ]
