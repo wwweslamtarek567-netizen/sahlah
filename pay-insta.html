@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>انستا باي - سهلة</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
+<script>const DB_URL="https://sahlah-c6152-default-rtdb.firebaseio.com";</script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f5f5f5;font-family:'Cairo',sans-serif}
+.h{background:#6a2f9a;color:#fff;padding:20px;text-align:center;font-size:20px;font-weight:800}
+.box{background:#fff;margin:15px;border-radius:18px;padding:20px;box-shadow:0 4px 15px #0001;text-align:center}
+.num{font-size:28px;font-weight:800;margin:14px 0;background:#f8f0ff;padding:14px;border-radius:12px;border:2px dashed #6a2f9a;direction:ltr}
+.btn{border:none;padding:14px 0;width:100%;border-radius:12px;font-size:16px;font-weight:800;cursor:pointer}
+.btn-copy{background:#6a2f9a;color:#fff}
+.btn-send{background:#000;color:#fff;margin-top:14px}
+.btn-send:disabled{background:#888;cursor:not-allowed}
+.steps{text-align:right;margin-top:18px;background:#f8f0ff;padding:14px;border-radius:12px;font-size:13px;line-height:1.9;border:1px solid #e0c0ff}
+input{width:100%;padding:14px;margin-top:12px;border-radius:12px;border:1.5px solid #ddd;font-family:'Cairo';font-size:14px}
+#prev{width:100%;border-radius:12px;margin-top:12px;display:none;max-height:350px;object-fit:contain;border:1px solid #eee}
+#st{font-size:12px;margin-top:8px;min-height:18px}
+</style>
+</head>
+<body>
+<div class="h">انستا باي - InstaPay</div>
+<div class="box">
+<h2 style="margin:10px 0 5px">حول على الرقم ده</h2>
+<div class="num">01023284996</div>
+<button class="btn btn-copy" onclick="navigator.clipboard.writeText('01023284996');alert('تم نسخ الرقم: 01023284996')">📋 نسخ الرقم</button>
+
+<div class="steps">
+<b>خطوات التحويل:</b><br>
+1- افتح تطبيق انستا باي<br>
+2- دوس ارسال نقود واختار رقم تليفون<br>
+3- اكتب الرقم اللي فوق والمبلغ<br>
+4- بعد التحويل ارفع سكرين شوت التحويل
+</div>
+
+<input type="tel" id="phone" placeholder="رقمك اللي مسجل بيه في سهلة (010...)">
+<input type="number" id="amount" placeholder="المبلغ اللي حولته مثلا 500">
+<input type="file" id="file" accept="image/*">
+<div id="st"></div>
+<img id="prev">
+<button id="send" class="btn btn-send" disabled>⏳ اختار صورة التحويل أولا</button>
+<br><br>
+<button onclick="location.href='payment.html'" style="background:none;border:none;color:#888;font-family:'Cairo'">‹ رجوع لطرق الدفع</button>
+</div>
+
+<script>
+let b64="", ready=false;
+const fileInput=document.getElementById('file');
+const prev=document.getElementById('prev');
+const st=document.getElementById('st');
+const sendBtn=document.getElementById('send');
+const phoneInput=document.getElementById('phone');
+let saved=localStorage.getItem('rider_phone')||""; if(saved) phoneInput.value=saved;
+
+fileInput.onchange=e=>{
+  let f=e.target.files[0]; if(!f) return;
+  st.style.color='#e67e00'; st.innerText="⏳ جاري ضغط الصورة..."; sendBtn.disabled=true; sendBtn.innerText="⏳ جاري تجهيز الصورة..."; ready=false;
+  let r=new FileReader();
+  r.onload=ev=>{
+    let im=new Image();
+    im.onload=()=>{
+      let c=document.createElement('canvas'), max=700, w=im.width, h=im.height;
+      if(w>max){h=h*max/w; w=max;} c.width=w; c.height=h; c.getContext('2d').drawImage(im,0,0,w,h);
+      b64=c.toDataURL('image/jpeg',0.4);
+      prev.src=b64; prev.style.display='block';
+      st.style.color='#00a651'; st.innerText="✅ الصورة جاهزة - "+Math.round(b64.length/1024)+"KB";
+      sendBtn.disabled=false; sendBtn.innerText="✅ انا حولت - تأكيد انستا باي"; ready=true;
+    };
+    im.src=ev.target.result;
+  };
+  r.readAsDataURL(f);
+};
+
+sendBtn.onclick=async()=>{
+  let phone=phoneInput.value.trim();
+  let amount=document.getElementById('amount').value.trim();
+  if(phone.length<10) return alert("اكتب رقمك");
+  if(!amount||parseFloat(amount)<=0) return alert("اكتب المبلغ");
+  if(!ready||!b64) return alert("استنى الصورة تجهز");
+  localStorage.setItem('rider_phone',phone);
+  sendBtn.disabled=true; sendBtn.innerText="جاري البحث عن اسمك...";
+  let riderName=phone;
+  try{
+    let rs=await fetch(DB_URL+'/riders.json?t='+Date.now());
+    let riders=await rs.json();
+    if(riders){
+      if(Array.isArray(riders)){
+        let f=riders.find(v=>String(v.phone).trim()==String(phone).trim());
+        if(f) riderName=f.name||f.riderName||phone;
+      }else{
+        for(let k in riders){ if(String(riders[k].phone||k).trim()==String(phone).trim()){ riderName=riders[k].name||riders[k].riderName||phone; break; } }
+      }
+    }
+  }catch(e){}
+  sendBtn.innerText="جاري الارسال...";
+  let payload={
+    phone:phone, riderName:riderName, name:riderName,
+    amount:parseFloat(amount), screenshot:b64,
+    method:"InstaPay", status:"pending",
+    timestamp:Date.now(), dateStr:new Date().toLocaleString('ar-EG')
+  };
+  try{
+    let res=await fetch(DB_URL+'/recharge_requests.json',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    let j=await res.json();
+    if(!j||!j.name) throw new Error();
+    alert('✅ تم ارسال طلب انستا باي باسم: '+riderName);
+    location.href='index.html';
+  }catch(err){
+    alert('فشل الارسال');
+    sendBtn.disabled=false; sendBtn.innerText="✅ انا حولت - تأكيد انستا باي";
+  }
+};
+</script>
+</body>
+  </html>
