@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>البيانات الشخصية - سهلة</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="config.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Cairo',sans-serif}
+body{background:#f6f6f6;min-height:100vh;padding-bottom:20px}
+.header{height:85px;background:#ff7410;border-radius:0 0 28px 28px;display:flex;align-items:center;justify-content:space-between;padding:0 15px;color:#fff;position:relative;overflow:hidden}
+.header .logo-box{position:absolute;right:0;top:0;width:100%;height:100%;display:flex;align-items:center;z-index:1}
+.header .logo-box img{width:100%;height:100%;object-fit:fill}
+.header .title{position:relative;z-index:2;font-weight:800;font-size:18px;width:100%;text-align:center}
+.back{position:relative;z-index:2;background:rgba(0,0,0,.2);width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;text-decoration:none;font-size:18px}
+.content{padding:15px 12px;max-width:480px;margin:auto}
+.top-card{background:#fff;border-radius:20px;padding:20px;text-align:center;box-shadow:0 4px 15px rgba(0,0,0,.06)}
+.avatar{width:85px;height:85px;border-radius:50%;border:3px solid #ff7410;padding:3px;margin:0 auto 10px;display:block;object-fit:cover;background:#fff}
+.name{font-size:20px;font-weight:800}
+.phone-id{margin-top:6px;color:#999;font-size:13px;font-weight:700;direction:ltr}
+.card{background:#fff;border-radius:16px;margin-top:14px;padding:6px 16px;box-shadow:0 2px 10px rgba(0,0,0,.04)}
+.item{display:flex;justify-content:space-between;align-items:center;padding:16px 0;border-bottom:1px solid #f2f2f2}
+.item:last-child{border:none}
+.item .left{display:flex;align-items:center;gap:10px;color:#666;font-size:13px;font-weight:700}
+.item .left i{width:32px;height:32px;background:#fff7e6;color:#ff7410;border-radius:8px;display:flex;align-items:center;justify-content:center}
+.item .right{font-weight:800;font-size:14px;color:#222;max-width:60%;text-align:left;word-break:break-word}
+.badge{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:800;display:inline-block}
+.badge-orange{background:#fff0dd;color:#ed6f0a}
+.badge-green{background:#e8f8ee;color:#0ab04a}
+.btn{width:100%;height:52px;border-radius:14px;border:1.5px solid #ffe0b8;background:#fff;color:#ff7410;font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;margin-top:16px}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo-box"><img src="logo-white.png" alt="سهلة"></div>
+  <a class="back" href="profile.html"><i class="fa-solid fa-chevron-right"></i></a>
+  <div class="title">البيانات الشخصية</div>
+  <div style="width:38px;z-index:2"></div>
+</div>
+
+<div class="content">
+  <div class="top-card">
+    <img src="rider.png" class="avatar">
+    <div class="name" id="vName">--</div>
+    <div class="phone-id" id="vPhone">--</div>
+  </div>
+
+  <div class="card">
+    <div class="item">
+      <div class="left"><i class="fa-solid fa-user"></i> الاسم</div>
+      <div class="right" id="dName">--</div>
+    </div>
+    <div class="item">
+      <div class="left"><i class="fa-solid fa-phone"></i> الرقم</div>
+      <div class="right" style="direction:ltr" id="dPhone">--</div>
+    </div>
+    <div class="item">
+      <div class="left"><i class="fa-solid fa-cake-candles"></i> السن</div>
+      <div class="right" id="dAge">--</div>
+    </div>
+    <div class="item">
+      <div class="left"><i class="fa-solid fa-location-dot"></i> العنوان</div>
+      <div class="right" id="dAddress">--</div>
+    </div>
+    <div class="item">
+      <div class="left"><i class="fa-solid fa-motorcycle"></i> المركبة</div>
+      <div class="right"><span class="badge badge-orange" id="dVehicle">--</span></div>
+    </div>
+    <div class="item">
+      <div class="left"><i class="fa-solid fa-wallet"></i> الرصيد</div>
+      <div class="right"><span class="badge badge-green" id="dBalance">-- جنيه</span></div>
+    </div>
+  </div>
+
+  <a href="profile.html" class="btn"><i class="fa-solid fa-arrow-right"></i> رجوع لحسابي</a>
+</div>
+
+<script>
+function cleanP(p){ return String(p||'').replace(/\D/g,''); }
+
+async function loadPersonal(){
+  // 1- قراءة من السيرفر (نفس المكان اللي بتسجل فيه)
+  var riderId = localStorage.getItem('riderId') || localStorage.getItem('riderPhone') || '';
+  var riderKey = cleanP(riderId);
+
+  try{
+    if(riderKey && typeof DB_URL !== 'undefined'){
+      let res = await fetch(DB_URL + '/riders/' + riderKey + '.json?t=' + Date.now());
+      let me = await res.json();
+      if(me && me.name){
+        document.getElementById('vName').innerText = me.name;
+        document.getElementById('vPhone').innerText = me.phoneRaw || me.phone;
+        document.getElementById('dName').innerText = me.name;
+        document.getElementById('dPhone').innerText = me.phoneRaw || me.phone;
+        document.getElementById('dAge').innerText = me.age ? me.age + ' سنة' : '--';
+        document.getElementById('dAddress').innerText = me.address || '--';
+        document.getElementById('dVehicle').innerText = me.vehicle || '--';
+        document.getElementById('dBalance').innerText = parseFloat(me.balance||0).toFixed(2) + ' جنيه';
+        return;
+      }
+    }
+  }catch(e){ console.log(e); }
+
+  // 2- لو مفيش نت، يقرا من localStorage اللي جاي من صفحة التسجيل بتاعتك
+  document.getElementById('vName').innerText = localStorage.getItem('riderName') || '--';
+  document.getElementById('vPhone').innerText = localStorage.getItem('riderPhone') || '--';
+  document.getElementById('dName').innerText = localStorage.getItem('riderName') || '--';
+  document.getElementById('dPhone').innerText = localStorage.getItem('riderPhone') || '--';
+  document.getElementById('dAge').innerText = (localStorage.getItem('riderAge') ? localStorage.getItem('riderAge') + ' سنة' : '--');
+  document.getElementById('dAddress').innerText = localStorage.getItem('riderAddress') || '--';
+  document.getElementById('dVehicle').innerText = localStorage.getItem('riderVehicle') || '--';
+  let bal = localStorage.getItem('riderBalance') || localStorage.getItem('balance_' + riderKey) || '0';
+  document.getElementById('dBalance').innerText = parseFloat(bal||0).toFixed(2) + ' جنيه';
+}
+
+window.onload = loadPersonal;
+</script>
+</body>
+  </html>
