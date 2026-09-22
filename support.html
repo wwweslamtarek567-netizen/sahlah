@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مساعدة ودعم - سهلة</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:'Cairo',sans-serif;background:#f6f6f6}
+.header{background:#ff9d00;color:white;padding:12px 15px;display:flex;justify-content:space-between;align-items:center}
+.card{background:white;margin:15px;border-radius:22px;padding:18px;box-shadow:0 4px 15px rgba(0,0,0,.06);text-align:center}
+.num{font-size:28px;font-weight:800;direction:ltr;background:#fff7e6;border:2px dashed #ff9d00;padding:12px;border-radius:14px;margin:12px 0}
+.btn{width:100%;border:none;padding:16px;border-radius:14px;font-family:'Cairo';font-weight:800;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;margin-top:10px;text-decoration:none}
+.btn-call{background:#000;color:white}
+.btn-wa{background:#25D366;color:white}
+.btn-copy{background:#fff3e0;color:#ff6a00;border:1.5px solid #ff9d00}
+.info{text-align:right;background:#f9f9f9;border-radius:14px;padding:14px;margin-top:15px;line-height:2;font-size:14px}
+.back{width:calc(100% - 30px);margin:15px;background:white;border:1px solid #eee;padding:14px;border-radius:14px;font-family:'Cairo';font-weight:700}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <i class="fa-solid fa-chevron-right" style="font-size:22px;cursor:pointer" onclick="history.back()"></i>
+  <div style="font-weight:800;font-size:20px">مساعدة ودعم</div>
+  <i class="fa-solid fa-headset" style="font-size:22px"></i>
+</div>
+
+<div class="card">
+  <div style="width:80px;height:80px;background:#fff3e0;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 10px"><i class="fa-solid fa-headset" style="font-size:38px;color:#ff9d00"></i></div>
+  <h2 style="margin:5px 0">مركز مساعدة سهلة</h2>
+  <p style="color:#888;margin:0;font-size:13px">موجودين لمساعدتك 24 ساعة</p>
+  
+  <div class="num">01023284996</div>
+
+  <a href="tel:01023284996" class="btn btn-call"><i class="fa-solid fa-phone"></i> اتصال مباشر</a>
+  <a href="https://wa.me/201023284996?text=السلام%20عليكم%20محتاج%20مساعدة%20في%20تطبيق%20سهلة" target="_blank" class="btn btn-wa"><i class="fa-brands fa-whatsapp" style="font-size:22px"></i> واتساب</a>
+  <button class="btn btn-copy" onclick="navigator.clipboard.writeText('01023284996');alert('تم نسخ الرقم')"><i class="fa-regular fa-copy"></i> نسخ الرقم</button>
+
+  <div class="info">
+    <b><i class="fa-regular fa-clock"></i> مواعيد العمل:</b> من 9 صباحا لـ 12 مساء يوميا<br>
+    <b><i class="fa-solid fa-bolt"></i> للطوارئ:</b> اتصل مباشر هنرد فورا<br>
+    <b><i class="fa-brands fa-whatsapp"></i> واتساب:</b> ابعتلنا مشكلتك بالصور<br>
+    <b><i class="fa-solid fa-location-dot"></i> ملاحظة:</b> لو عندك مشكلة في طلب، ابعت رقم الطلب في رسالة الواتساب
+  </div>
+</div>
+
+<div class="card" style="text-align:right">
+  <h3 style="margin:0 0 10px"><i class="fa-regular fa-circle-question" style="color:#ff9d00"></i> اسئلة شائعة</h3>
+  <details style="padding:10px;border-bottom:1px solid #f0f0f0"><summary style="font-weight:700;cursor:pointer">الرصيد موصلش بعد التحويل؟</summary><div style="color:#666;font-size:13px;margin-top:8px">ابعت سكرين شوت التحويل على واتساب 01023284996 وهنفعله في 5 دقايق</div></details>
+  <details style="padding:10px;border-bottom:1px solid #f0f0f0"><summary style="font-weight:700;cursor:pointer">نسيت كلمة السر؟</summary><div style="color:#666;font-size:13px;margin-top:8px">اتصل بنا على نفس الرقم وهنبعتلك كلمة سر جديدة</div></details>
+  <details style="padding:10px"><summary style="font-weight:700;cursor:pointer">عايز تبقى مندوب؟</summary><div style="color:#666;font-size:13px;margin-top:8px">ابعت بياناتك على واتساب: الاسم - الرقم - صورة البطاقة</div></details>
+</div>
+
+<button class="back" onclick="history.back()"><i class="fa-solid fa-arrow-right"></i> رجوع لحسابي</button>
+
+</body>
+  </html>
