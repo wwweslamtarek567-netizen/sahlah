@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>طريقة الدفع - سهلة</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="config.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Cairo',sans-serif}
+body{background:#f7f7f7;padding-bottom:20px}
+.header{background:#ff6a00;color:#fff;padding:14px 16px;display:flex;justify-content:space-between;align-items:center}
+.header a{color:#fff;text-decoration:none}
+.card{background:#fff;margin:12px;border-radius:20px;padding:16px;box-shadow:0 4px 20px rgba(0,0,0,.05)}
+.summary{display:flex;justify-content:space-between;align-items:center;border-bottom:1px dashed #eee;padding-bottom:12px;margin-bottom:12px}
+.pay-option{border:1.5px solid #eee;border-radius:14px;padding:14px;display:flex;align-items:center;gap:12px;margin-top:10px;cursor:pointer}
+.pay-option.active{border-color:#ff6a00;background:#fff6ed}
+.pay-option i{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px}
+.opt-vodafone i{background:#e60000;color:#fff}
+.opt-instapay i{background:#4a00e0;color:#fff}
+.opt-cod i{background:#00a651;color:#fff}
+.btn-confirm{width:100%;background:#ff6a00;color:#fff;border:none;border-radius:14px;padding:16px;font-size:17px;font-weight:900;margin-top:16px;cursor:pointer}
+.btn-upload{width:100%;background:#111;color:#fff;border:2px dashed #ff6a00;border-radius:14px;padding:20px;font-size:14px;font-weight:800;margin-top:16px;cursor:pointer;text-align:center}
+.btn-upload img{max-width:100%;border-radius:10px;margin-top:10px;display:none}
+.details{background:#f9f9f9;border-radius:12px;padding:12px;margin-top:12px;font-size:12px;font-weight:700;line-height:2;display:none}
+.details.active{display:block}
+.copy-btn{background:#111;color:#fff;border:none;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:800;margin-right:8px;cursor:pointer}
+input[type=file]{display:none}
+</style>
+</head>
+<body>
+<div class="header">
+  <a href="shop.html"><i class="fa-solid fa-arrow-right"></i></a>
+  <h2>طريقة الدفع</h2>
+  <i class="fa-solid fa-lock"></i>
+</div>
+<div class="card">
+  <div class="summary"><b>ملخص الطلب</b><b id="orderPrice" style="color:#ff6a00">0 ج</b></div>
+  <div id="orderInfo" style="font-size:12px;color:#666;font-weight:700;line-height:1.8"></div>
+</div>
+<div class="card">
+  <b style="font-size:14px">اختر طريقة الدفع:</b>
+  <div class="pay-option active opt-cod" onclick="selectPay('cod',this)"><i class="fa-solid fa-hand-holding-dollar"></i><div><b>الدفع عند الاستلام</b><br><small>ادفع لما تستلم الطقم</small></div></div>
+  <div class="pay-option opt-vodafone" onclick="selectPay('vodafone',this)"><i class="fa-solid fa-mobile-screen"></i><div><b>فودافون كاش</b><br><small>حول وارفع الاسكرين</small></div></div>
+  <div class="pay-option opt-instapay" onclick="selectPay('instapay',this)"><i class="fa-solid fa-bolt"></i><div><b>انستا باي</b><br><small>تحويل لحظي</small></div></div>
+
+  <div id="vodafoneDetails" class="details">حول على: <b>01012345678</b> <button class="copy-btn" onclick="copyNum('01012345678')">نسخ</button></div>
+  <div id="instapayDetails" class="details">انستا باي: <b>sahla@instapay</b> <button class="copy-btn" onclick="copyNum('sahla@instapay')">نسخ</button></div>
+
+  <!-- رفع الاسكرين -->
+  <div id="uploadBox" style="display:none">
+    <label for="screenFile" class="btn-upload">
+      <i class="fa-solid fa-cloud-arrow-up" style="font-size:22px"></i><br>
+      <span id="uploadText">اضغط لرفع اسكرين التحويل</span>
+      <img id="previewImg">
+    </label>
+    <input type="file" id="screenFile" accept="image/*" onchange="handleFile(this)">
+  </div>
+
+  <button class="btn-confirm" onclick="confirmOrder()"><i class="fa-solid fa-check"></i> تأكيد الطلب</button>
+</div>
+
+<script>
+let selectedPay='cod';
+let tempOrder=null;
+let screenBase64="";
+
+function selectPay(type,el){
+ selectedPay=type;
+ document.querySelectorAll('.pay-option').forEach(o=>o.classList.remove('active'));
+ el.classList.add('active');
+ document.getElementById('vodafoneDetails').classList.toggle('active', type=='vodafone');
+ document.getElementById('instapayDetails').classList.toggle('active', type=='instapay');
+ document.getElementById('uploadBox').style.display = type=='cod'? 'none' : 'block';
+ if(type=='cod'){ screenBase64=""; }
+}
+
+function copyNum(t){navigator.clipboard.writeText(t); alert('تم النسخ: '+t);}
+
+function handleFile(input){
+ let file=input.files[0];
+ if(!file) return;
+ if(file.size > 2*1024*1024){ alert('الصورة كبيرة، اختار صورة اقل من 2 ميجا'); return }
+ let reader=new FileReader();
+ reader.onload=function(e){
+   screenBase64=e.target.result;
+   let img=document.getElementById('previewImg');
+   img.src=screenBase64; img.style.display='block';
+   document.getElementById('uploadText').innerText='✓ تم اختيار الاسكرين - اضغط لتغييره';
+ }
+ reader.readAsDataURL(file);
+}
+
+window.onload=()=>{
+ let data=localStorage.getItem('temp_kit_order');
+ if(!data){location.href='shop.html'; return}
+ tempOrder=JSON.parse(data);
+ document.getElementById('orderPrice').innerText=tempOrder.price+' جنيه';
+ let kitName = tempOrder.kit=='full'?'طقم كامل' : tempOrder.kit=='bag'?'الشنطة فقط':'التيشيرت فقط';
+ document.getElementById('orderInfo').innerHTML=`${kitName} - مقاس ${tempOrder.size}<br>الاسم: ${tempOrder.name} - ${tempOrder.phone}<br>المدينة: ${tempOrder.city}`;
+};
+
+async function confirmOrder(){
+ if(!tempOrder) return;
+ if(selectedPay!='cod' &&!screenBase64){
+   alert('من فضلك ارفع اسكرين التحويل أولاً'); return;
+ }
+ let finalOrder={
+  ...tempOrder,
+   payMethod:selectedPay,
+   screenshot: screenBase64 || "no-screenshot-cod",
+   status: selectedPay=='cod'?'جديد - دفع عند الاستلام':'بانتظار المراجعة - مع اسكرين',
+   timestamp: Date.now()
+ };
+ try{
+   await fetch(DB_URL+'/kit_orders.json',{
+     method:'POST',
+     headers:{'Content-Type':'application/json'},
+     body:JSON.stringify(finalOrder)
+   });
+   localStorage.removeItem('temp_kit_order');
+   alert('✓ تم استلام طلبك! هيظهر في لوحة التحكم بالاسكرين');
+   location.href='index.html';
+ }catch(e){
+   alert('خطأ في الاتصال، حاول تاني');
+ }
+}
+</script>
+</body>
+  </html>
