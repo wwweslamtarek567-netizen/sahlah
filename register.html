@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تسجيل مندوب جديد</title>
+<script>
+  if(localStorage.getItem('riderId')){
+    window.location.href = 'index.html';
+  }
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Cairo', sans-serif;}
+body{background-color: #ff6a00;min-height: 100vh;}
+.top-bg{width: 100%;height: 50vh;background-image: url('bg.jpg.png');background-size: cover;background-position: top center;background-repeat: no-repeat;}
+.container{background: white;border-radius: 30px 30px 0 0;padding: 25px 20px;margin-top: -30px;box-shadow: 0 -5px 20px rgba(0,0,0,0.1);}
+.title{text-align: center;color: #ff6a00;font-size: 20px;font-weight: 700;margin-bottom: 20px;}
+.input{margin-bottom: 12px;position: relative;}
+.input input{width: 100%;padding: 14px 45px 14px 15px;border: 2px solid #eee;border-radius: 12px;font-size: 15px;background: #f9f9f9;outline: none;text-align: right;}
+.input input:focus{border-color: #ff6a00;background: white;}
+.icon{position: absolute;right: 15px;top: 50%;transform: translateY(-50%);font-size: 18px;}
+.question{text-align: center;font-size: 16px;font-weight: 700;margin: 20px 0 10px;color: #333;}
+.options{display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;}
+.option{border: 2px solid #eee;border-radius: 12px;padding: 12px 5px;text-align: center;cursor: pointer;background: #f9f9f9;transition: 0.3s;}
+.option.active{border-color: #ff6a00;background: #fff5f0;}
+.option-icon{font-size: 28px;margin-bottom: 5px;}
+.option-text{font-size: 13px;font-weight: 600;}
+.id-uploads{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:15px 0}
+.id-box{border:2px dashed #ff6a00;border-radius:14px;padding:10px;text-align:center;background:#fffaf0;cursor:pointer;position:relative;overflow:hidden;min-height:130px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.id-box.has-img{border-style:solid}
+.id-box img{width:100%;height:110px;object-fit:cover;border-radius:10px;display:none}
+.id-box.has-img img{display:block}
+.id-box.has-img.id-placeholder{display:none}
+.id-placeholder{font-size:12px;font-weight:800;color:#ff6a00;line-height:1.4}
+.id-box input{display:none}
+.id-label{font-size:12px;font-weight:800;margin-top:6px}
+.btn{width: 100%;padding: 16px;background: #ff6a00;color: white;border: none;border-radius: 14px;font-size: 18px;font-weight: 700;margin-bottom: 15px;cursor: pointer;}
+.btn:active{transform: scale(0.98);}
+.btn:disabled{background:#ccc;}
+.login{text-align: center;font-size: 14px;color: #666;}
+.login a{color: #ff6a00;font-weight: 700;text-decoration: none;}
+</style>
+</head>
+<body>
+
+<div class="top-bg"></div>
+
+<div class="container">
+  <h2 class="title">تسجيل مندوب جديد</h2>
+  <form id="registerForm">
+    <div class="input"><span class="icon">👤</span><input type="text" id="name" placeholder="الاسم الكامل" required></div>
+    <div class="input"><span class="icon">📱</span><input type="tel" id="phone" placeholder="رقم الموبايل" required></div>
+    <div class="input"><span class="icon">📅</span><input type="number" id="age" placeholder="السن" required></div>
+    <div class="input"><span class="icon">📍</span><input type="text" id="address" placeholder="العنوان" required></div>
+
+    <p class="question">صور البطاقة (مطلوبة)</p>
+    <div class="id-uploads">
+      <div class="id-box" id="frontBox" onclick="document.getElementById('idFrontInput').click()">
+        <input type="file" id="idFrontInput" accept="image/*" onchange="handleIdFile(this,'front')">
+        <img id="frontPreview">
+        <div class="id-placeholder">📷<br>صورة البطاقة<br><b>وش</b><br><small style="color:#888">دوس للرفع</small></div>
+        <div class="id-label">الوش</div>
+      </div>
+      <div class="id-box" id="backBox" onclick="document.getElementById('idBackInput').click()">
+        <input type="file" id="idBackInput" accept="image/*" onchange="handleIdFile(this,'back')">
+        <img id="backPreview">
+        <div class="id-placeholder">📷<br>صورة البطاقة<br><b>ظهر</b><br><small style="color:#888">دوس للرفع</small></div>
+        <div class="id-label">الظهر</div>
+      </div>
+    </div>
+    <div id="idStatus" style="text-align:center;font-size:12px;color:#666;margin-bottom:10px">لازم ترفع الصورتين</div>
+
+    <p class="question">معاك ايه ؟</p>
+    <div class="options">
+      <div class="option" data-value="عربية"><div class="option-icon">🚗</div><div class="option-text">عربية</div></div>
+      <div class="option" data-value="موتوسيكل"><div class="option-icon">🏍️</div><div class="option-text">موتوسيكل</div></div>
+      <div class="option" data-value="عجلة"><div class="option-icon">🚲</div><div class="option-text">عجلة</div></div>
+      <div class="option" data-value="على رجلك"><div class="option-icon">🚶</div><div class="option-text">على رجلك</div></div>
+    </div>
+    <input type="hidden" id="vehicle" required>
+    <button type="submit" class="btn" id="submitBtn">تسجيل</button>
+  </form>
+  <p class="login">لديك حساب ؟ <a href="login.html">تسجيل دخول</a></p>
+</div>
+
+<script>
+const DB_URL = "https://sahlah-c6152-default-rtdb.firebaseio.com";
+function cleanP(p){ return String(p||'').replace(/\D/g,''); }
+
+let idFrontBase64 = null;
+let idBackBase64 = null;
+
+function handleIdFile(input, type){
+  let file = input.files[0];
+  if(!file) return;
+  if(file.size > 5*1024*1024){ alert('الصورة كبيرة اوي، اختار صورة اقل من 5 ميجا'); return; }
+  let reader = new FileReader();
+  reader.onload = function(e){
+    let base64 = e.target.result;
+    // ضغط بسيط بال canvas عشان Firebase
+    let img = new Image();
+    img.onload = function(){
+      let canvas = document.createElement('canvas');
+      let maxW = 800;
+      let scale = Math.min(1, maxW / img.width);
+      canvas.width = img.width * scale;
+      canvas.height = img.height * scale;
+      let ctx = canvas.getContext('2d');
+      ctx.drawImage(img,0,0,canvas.width,canvas.height);
+      let compressed = canvas.toDataURL('image/jpeg',0.7);
+      if(type=='front'){
+        idFrontBase64 = compressed;
+        document.getElementById('frontPreview').src = compressed;
+        document.getElementById('frontBox').classList.add('has-img');
+      }else{
+        idBackBase64 = compressed;
+        document.getElementById('backPreview').src = compressed;
+        document.getElementById('backBox').classList.add('has-img');
+      }
+      updateIdStatus();
+    };
+    img.src = base64;
+  };
+  reader.readAsDataURL(file);
+}
+
+function updateIdStatus(){
+  let s = document.getElementById('idStatus');
+  if(idFrontBase64 && idBackBase64){ s.innerText='✅ تم رفع الصورتين'; s.style.color='#2E7D32'; }
+  else if(idFrontBase64 || idBackBase64){ s.innerText='باقي صورة واحدة'; s.style.color='#e65100'; }
+  else { s.innerText='لازم ترفع الصورتين'; s.style.color='#666'; }
+}
+
+const options = document.querySelectorAll('.option');
+const vehicleInput = document.getElementById('vehicle');
+options.forEach(option => {
+  option.addEventListener('click', () => {
+    options.forEach(o => o.classList.remove('active'));
+    option.classList.add('active');
+    vehicleInput.value = option.dataset.value;
+  });
+});
+
+document.getElementById('registerForm').addEventListener('submit', async function(e){
+  e.preventDefault();
+  if(!vehicleInput.value){ alert('اختار معاك ايه الاول'); return; }
+  if(!idFrontBase64 ||!idBackBase64){ alert('لازم ترفع صورة البطاقة وش وظهر'); return; }
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.innerText = 'جاري رفع الصور والتسجيل...';
+
+  var name = document.getElementById('name').value.trim();
+  var phoneRaw = document.getElementById('phone').value.trim();
+  var phone = cleanP(phoneRaw);
+  var age = document.getElementById('age').value.trim();
+  var address = document.getElementById('address').value.trim();
+  var vehicle = vehicleInput.value;
+
+  try {
+    const riderData = {
+      name: name,
+      phone: phone,
+      phoneRaw: phoneRaw,
+      age: age,
+      address: address,
+      vehicle: vehicle,
+      idFront: idFrontBase64,
+      idBack: idBackBase64,
+      hasId: true,
+      idUploadedAt: new Date().toISOString(),
+      balance: 0,
+      orders: 0,
+      delivered: 0,
+      cancelled: 0,
+      status: "متاح",
+      createdAt: new Date().toISOString()
+    };
+
+    let res = await fetch(`${DB_URL}/riders/${phone}.json`, {
+      method: 'PUT',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(riderData)
+    });
+
+    if(!res.ok) throw new Error('فشل الحفظ في السيرفر');
+
+    localStorage.setItem('riderName', name);
+    localStorage.setItem('riderPhone', phone);
+    localStorage.setItem('riderId', phone);
+    localStorage.setItem('riderAge', age);
+    localStorage.setItem('riderAddress', address);
+    localStorage.setItem('riderVehicle', vehicle);
+    localStorage.setItem('riderBalance', 0);
+    localStorage.setItem('balance_' + phone, 0);
+
+    alert("تم التسجيل بنجاح ✓\nمرحبا " + name + "\nفي انتظار تفعيل حسابك من الإدارة");
+    window.location.href = "index.html";
+
+  } catch(err){
+    alert('حصل خطأ: ' + err.message);
+    btn.disabled = false;
+    btn.innerText = 'تسجيل';
+  }
+});
+</script>
+</body>
+  </html>
