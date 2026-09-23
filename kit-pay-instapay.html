@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>دفع انستا باي</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="config.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Cairo',sans-serif}
+body{background:#f7f7f7;padding-bottom:20px}
+.header{background:#6a1b9a;color:#fff;padding:14px 16px;display:flex;justify-content:space-between;align-items:center}
+.header a{color:#fff;text-decoration:none}
+.card{background:#fff;margin:12px;border-radius:20px;padding:16px;text-align:center}
+.num-box{background:#f3e5f5;border:1.5px dashed #6a1b9a;border-radius:14px;padding:14px;margin:12px 0;font-size:26px;font-weight:900;direction:ltr}
+.btn-copy{background:#111;color:#fff;border:none;border-radius:10px;padding:10px 18px;font-weight:800;cursor:pointer}
+.btn-upload{display:block;width:100%;background:#fff;border:2px dashed #6a1b9a;border-radius:14px;padding:22px;text-align:center;margin-top:14px;cursor:pointer}
+#previewImg{max-width:100%;border-radius:12px;margin-top:10px;display:none}
+.btn-confirm{width:100%;background:#6a1b9a;color:#fff;border:none;border-radius:14px;padding:16px;font-size:17px;font-weight:900;margin-top:16px;cursor:pointer}
+.btn-confirm:disabled{background:#aaa}
+</style>
+</head>
+<body>
+<div class="header"><a href="kit-payment.html"><i class="fa-solid fa-arrow-right"></i></a><h2>انستا باي</h2><i class="fa-solid fa-building-columns"></i></div>
+<div class="card">
+  <p style="font-weight:800">حول على انستا باي:</p>
+  <div class="num-box">01023284996</div>
+  <button class="btn-copy" onclick="navigator.clipboard.writeText('01023284996');alert('تم النسخ ✓')">نسخ الرقم</button>
+  <p style="margin-top:12px;font-size:12px;color:#666;font-weight:700">بعد التحويل ارفع اسكرين شوت</p>
+  <label for="file" class="btn-upload"><span id="txt">اضغط لرفع الاسكرين</span><img id="previewImg"></label>
+  <input type="file" id="file" accept="image/*" style="display:none" onchange="handle(this)">
+  <button id="confirmBtn" class="btn-confirm" onclick="sendOrder()">تأكيد وارسال للادمن ✓</button>
+</div>
+<script>
+let base64="", tempOrder=null, orderKey=null;
+window.onload=()=>{
+  const urlParams = new URLSearchParams(location.search);
+  orderKey = urlParams.get('orderId') || urlParams.get('key');
+  tempOrder = JSON.parse(localStorage.getItem('temp_kit_order')||'null');
+  if(tempOrder && tempOrder.key) orderKey = tempOrder.key;
+  if(tempOrder && tempOrder.orderKey) orderKey = tempOrder.orderKey;
+}
+function handle(inp){
+  let f=inp.files[0]; if(!f) return;
+  if(f.size > 4*1024*1024){ alert('الصورة كبيرة جدا اختار صورة اقل من 4 ميجا'); return; }
+  let r=new FileReader();
+  r.onload=e=>{
+    base64=e.target.result;
+    document.getElementById('previewImg').src=base64;
+    document.getElementById('previewImg').style.display='block';
+    document.getElementById('txt').innerText='✓ تم اختيار الصورة';
+  };
+  r.readAsDataURL(f);
+}
+async function sendOrder(){
+  if(!base64){ alert('ارفع اسكرين التحويل الأول'); return; }
+  let btn=document.getElementById('confirmBtn');
+  btn.disabled=true; btn.innerText='جاري الارسال...';
+  try{
+    if(orderKey){
+      await fetch(`${DB_URL}/store_orders/${orderKey}.json`,{
+        method:'PATCH',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({
+          screenshot: base64,
+          payMethod: 'instapay',
+          payNumber: '01023284996',
+          status: 'pending_payment',
+          hasScreenshot: true,
+          screenshotAt: Date.now()
+        })
+      });
+    } else {
+      let finalOrder = {
+      ...(tempOrder||{}),
+        payMethod: 'instapay',
+        payNumber: '01023284996',
+        screenshot: base64,
+        status: 'pending_payment',
+        date: new Date().toLocaleString('ar-EG'),
+        timestamp: Date.now()
+      };
+      await fetch(DB_URL+'/store_orders.json',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify(finalOrder)
+      });
+    }
+    localStorage.removeItem('temp_kit_order');
+    alert('✓ تم ارسال طلبك بالاسكرين للادمن');
+    location.href='index.html';
+  }catch(e){
+    alert('خطأ: '+e.message);
+    btn.disabled=false; btn.innerText='تأكيد وارسال للادمن ✓';
+  }
+}
+</script>
+</body>
+                                                 </html>
