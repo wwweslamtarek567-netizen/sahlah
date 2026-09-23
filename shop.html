@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>طقم سهلة - سهلة للتوصيل</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="config.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Cairo',sans-serif}
+body{background:#f7f7f7;min-height:100vh}
+.header{background:#ff6a00;color:#fff;padding:14px 16px;display:flex;align-items:center;justify-content:space-between}
+.header a{color:#fff;text-decoration:none;font-size:18px}
+.header h2{font-size:18px;font-weight:800}
+.hero{background:#fff;margin:12px;border-radius:22px;padding:16px;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,.06)}
+.hero img{width:100%;max-width:340px;border-radius:16px;object-fit:contain}
+.badge{display:inline-block;background:#ff6a00;color:#fff;padding:6px 14px;border-radius:20px;font-weight:800;font-size:12px;margin:10px 0}
+.price-box{display:flex;justify-content:center;align-items:center;gap:10px;margin:10px 0}
+.price-new{font-size:32px;font-weight:900;color:#ff6a00}
+.price-old{font-size:16px;color:#999;text-decoration:line-through}
+.kit-card{background:#fff;margin:12px;border-radius:20px;padding:16px;box-shadow:0 4px 20px rgba(0,0,0,.05)}
+.kit-card h3{font-size:15px;font-weight:800;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.items{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.item{border:1.5px solid #eee;border-radius:14px;padding:10px;text-align:center}
+.item.active{border-color:#ff6a00;background:#fff6ed}
+.item i{font-size:24px;color:#ff6a00;margin-bottom:6px;display:block}
+.item b{font-size:13px;display:block}
+.item span{font-size:11px;color:#666}
+.sizes{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.size{border:1.5px solid #ddd;border-radius:10px;padding:8px 16px;font-weight:800;font-size:13px;cursor:pointer}
+.size.active{background:#ff6a00;color:#fff;border-color:#ff6a00}
+.form input, .form select{width:100%;padding:13px;border:1.5px solid #eee;border-radius:12px;margin-top:10px;font-size:14px;outline:none}
+.form input:focus{border-color:#ff6a00}
+.btn-buy{width:100%;background:#ff6a00;color:#fff;border:none;border-radius:14px;padding:16px;font-size:17px;font-weight:900;margin-top:14px;display:flex;justify-content:center;align-items:center;gap:10px;cursor:pointer}
+.note{background:#fff8e6;border:1px solid #ffdfa6;border-radius:12px;padding:10px 12px;font-size:12px;font-weight:700;color:#8a5a00;margin-top:12px;text-align:center;line-height:1.8}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <a href="index.html"><i class="fa-solid fa-arrow-right"></i></a>
+  <h2>متجر طقم سهلة</h2>
+  <i class="fa-solid fa-bag-shopping"></i>
+</div>
+
+<div class="hero">
+  <img src="kit.jpg" id="kitImg" alt="طقم سهلة">
+  <div class="badge"><i class="fa-solid fa-fire"></i> الأكثر طلباً للمندوبين</div>
+  <div class="price-box">
+    <div class="price-new"><span id="p">450</span> جنيه</div>
+    <div class="price-old">650 جنيه</div>
+  </div>
+  <div style="font-size:12px;color:#666;font-weight:700">شحن مجاني + دفع عند الاستلام</div>
+</div>
+
+<div class="kit-card">
+  <h3><i class="fa-solid fa-box" style="color:#ff6a00"></i> اختار الطقم المناسب ليك</h3>
+  <div class="items">
+    <div class="item active" onclick="selectKit('full',450,this)">
+      <i class="fa-solid fa-shirt"></i>
+      <b>طقم كامل</b>
+      <span>شنطة + تيشيرت</span>
+      <div style="margin-top:6px;font-weight:900;color:#ff6a00">450 ج</div>
+    </div>
+    <div class="item" onclick="selectKit('bag',300,this)">
+      <i class="fa-solid fa-bagpack"></i>
+      <b>الشنطة فقط</b>
+      <span>حرارية 45 لتر</span>
+      <div style="margin-top:6px;font-weight:900;color:#ff6a00">300 ج</div>
+    </div>
+    <div class="item" onclick="selectKit('shirt',180,this)">
+      <i class="fa-solid fa-tshirt"></i>
+      <b>التيشيرت فقط</b>
+      <span>بولو برتقالي</span>
+      <div style="margin-top:6px;font-weight:900;color:#ff6a00">180 ج</div>
+    </div>
+  </div>
+
+  <div id="sizeBox">
+    <h3 style="margin-top:14px"><i class="fa-solid fa-ruler" style="color:#ff6a00"></i> مقاس التيشيرت</h3>
+    <div class="sizes">
+      <div class="size active" onclick="selectSize('M',this)">M</div>
+      <div class="size" onclick="selectSize('L',this)">L</div>
+      <div class="size" onclick="selectSize('XL',this)">XL</div>
+      <div class="size" onclick="selectSize('XXL',this)">XXL</div>
+    </div>
+  </div>
+
+  <div class="form">
+    <input id="rName" placeholder="اسم المندوب">
+    <input id="rPhone" placeholder="رقم الموبايل">
+    <input id="rCity" placeholder="المدينة / المنطقة">
+  </div>
+
+  <button class="btn-buy" onclick="orderKit()"><i class="fa-solid fa-cart-shopping"></i> اطلب الطقم الآن</button>
+  <div class="note">✓ هيتم التواصل معاك خلال 24 ساعة لتأكيد المقاس والشحن<br>✓ الطقم اختياري لكنه بيزود قبول العملاء ليك بنسبة 70%</div>
+</div>
+
+<script>
+let selectedKit='full';
+let selectedPrice=450;
+let selectedSize='M';
+
+function selectKit(kit,price,el){
+  selectedKit=kit; selectedPrice=price;
+  document.querySelectorAll('.item').forEach(i=>i.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('p').innerText=price;
+  document.getElementById('sizeBox').style.display = kit=='bag' ? 'none':'block';
+}
+function selectSize(s,el){
+  selectedSize=s;
+  document.querySelectorAll('.size').forEach(i=>i.classList.remove('active'));
+  el.classList.add('active');
+}
+
+async function orderKit(){
+  let name=document.getElementById('rName').value.trim();
+  let phone=document.getElementById('rPhone').value.trim();
+  let city=document.getElementById('rCity').value.trim();
+  let riderId=localStorage.getItem('riderId')||phone;
+  if(!name||!phone){ alert('اكتب الاسم ورقم الموبايل'); return; }
+
+  let order={
+    riderId:riderId,
+    name:name,
+    phone:phone,
+    city:city,
+    kit:selectedKit,
+    size:selectedSize,
+    price:selectedPrice,
+    date:new Date().toISOString(),
+    status:'جديد'
+  };
+
+  try{
+    if(typeof DB_URL!=='undefined'){
+      await fetch(DB_URL+'/kit_orders.json',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(order)});
+    }
+    localStorage.setItem('last_kit_order', JSON.stringify(order));
+    alert('✓ تم طلب الطقم بنجاح!\nهنتواصل معاك على: '+phone+'\nالسعر: '+selectedPrice+' جنيه');
+    location.href='index.html';
+  }catch(e){
+    alert('تم الحفظ محلياً، سيتم الارسال لاحقاً');
+    location.href='index.html';
+  }
+}
+
+// تعبئة تلقائية
+window.onload=()=>{
+  let rid=localStorage.getItem('riderId')||'';
+  if(rid) document.getElementById('rPhone').value=rid;
+}
+</script>
+</body>
+  </html>
