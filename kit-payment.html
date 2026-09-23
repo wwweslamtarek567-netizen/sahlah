@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>طريقة الدفع - سهلة</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="config.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Cairo',sans-serif}
+body{background:#f7f7f7}
+.header{background:#ff6a00;color:#fff;padding:14px 16px;display:flex;justify-content:space-between;align-items:center}
+.header a{color:#fff;text-decoration:none}
+.card{background:#fff;margin:12px;border-radius:20px;padding:16px;box-shadow:0 4px 20px rgba(0,0,0,.05)}
+.pay-option{border:1.5px solid #eee;border-radius:16px;padding:16px;display:flex;align-items:center;gap:14px;margin-top:12px;cursor:pointer}
+.pay-option:active{transform:scale(.97);border-color:#ff6a00}
+.pay-option i.icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px}
+.opt-voda i.icon{background:#e60000;color:#fff}
+.opt-insta i.icon{background:#111;color:#fff}
+.num{font-weight:900;font-size:16px;direction:ltr;display:inline-block}
+</style>
+</head>
+<body>
+<div class="header"><a href="shop.html"><i class="fa-solid fa-arrow-right"></i></a><h2>اختر طريقة الدفع</h2><i class="fa-solid fa-lock"></i></div>
+<div class="card">
+  <b id="orderPrice" style="color:#ff6a00;font-size:18px">0 جنيه</b>
+  <div id="orderInfo" style="font-size:12px;color:#666;margin-top:6px;font-weight:700"></div>
+  <div id="orderKeyShow" style="font-size:10px;color:#aaa;margin-top:4px"></div>
+</div>
+<div class="card">
+  <div class="pay-option opt-voda" onclick="goPay('vodafone')">
+    <i class="icon fa-solid fa-mobile-screen"></i>
+    <div style="flex:1"><b>فودافون كاش</b><br><span class="num">01040791442</span><br><small style="color:#666">اضغط للدفع ورفع الاسكرين</small></div>
+    <i class="fa-solid fa-chevron-left" style="color:#999"></i>
+  </div>
+  <div class="pay-option opt-insta" onclick="goPay('instapay')">
+    <i class="icon fa-solid fa-bolt"></i>
+    <div style="flex:1"><b>انستا باي</b><br><span class="num">01023284996</span><br><small style="color:#666">اضغط للدفع ورفع الاسكرين</small></div>
+    <i class="fa-solid fa-chevron-left" style="color:#999"></i>
+  </div>
+</div>
+<script>
+let tempOrder=null;
+let orderKeyFromUrl = new URLSearchParams(location.search).get('order');
+window.onload=()=>{
+  let d=localStorage.getItem('temp_kit_order');
+  if(!d &&!orderKeyFromUrl){ location.href='shop.html'; return; }
+  if(d) tempOrder=JSON.parse(d);
+  if(orderKeyFromUrl && tempOrder) tempOrder.orderKey = orderKeyFromUrl;
+  if(tempOrder){
+    document.getElementById('orderPrice').innerText=tempOrder.price+' جنيه';
+    document.getElementById('orderInfo').innerText=tempOrder.name+' - '+tempOrder.kit+' - مقاس '+tempOrder.size;
+    document.getElementById('orderKeyShow').innerText='رقم الطلب: '+(tempOrder.orderKey||orderKeyFromUrl||'');
+  }
+};
+function goPay(method){
+  localStorage.setItem('temp_pay_method', method);
+  let key = (tempOrder && tempOrder.orderKey) || orderKeyFromUrl || '';
+  if(method=='vodafone'){ location.href='kit-pay-vodafone-cash.html?order='+key; }
+  else{ location.href='kit-pay-instapay.html?order='+key; }
+}
+</script>
+</body>
+  </html>
