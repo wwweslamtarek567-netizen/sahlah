@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>حسابي - سهلة للتوصيل</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;800&display=swap" rel="stylesheet">
+  <script src="config.js"></script>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;font-family:'Cairo',Arial,sans-serif;-webkit-tap-highlight-color:transparent;}
+    body{background:#f5f5f5;color:#222;min-height:100vh;}
+    .app{width:100%;max-width:480px;min-height:100vh;margin:auto;background:#f5f5f5;overflow:hidden;padding-bottom:80px;}
+    .header{height:85px;background:#ff7410;border-radius:0 0 28px 28px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:space-between;padding:0 15px;}
+    .logo-box{position:absolute;right:0;top:0;width:100%;height:100%;display:flex;align-items:center;z-index:1;}
+    .logo-box img{width:100%;height:100%;object-fit:fill;}
+    .content{padding:0 12px;margin-top:18px;}
+    .profile-card{background:#fff;border-radius:18px;min-height:110px;padding:16px 14px;box-shadow:0 4px 15px rgba(0,0,0,.06);display:flex;align-items:center;justify-content:space-between;gap:12px;}
+    .profile-info{flex:1;text-align:right;}
+    .profile-name{font-size:17px;font-weight:800;margin-bottom:8px;}
+    .role{display:inline-flex;align-items:center;gap:6px;background:#fff0dd;color:#ed6f0a;border-radius:20px;padding:4px 10px;font-size:12px;font-weight:800;margin-bottom:6px;}
+    .phone{direction:ltr;text-align:right;font-size:13px;color:#555;font-weight:600;}
+    .phone-icon{color:#ef7410;font-size:14px;margin-right:5px;}
+    .rider-photo{width:68px;height:68px;border-radius:50%;border:3px solid #f47716;padding:2px;background:#fff;object-fit:cover;}
+    .menu{margin-top:14px;display:flex;flex-direction:column;gap:10px;}
+    .menu-item{width:100%;height:62px;background:#fff;border-radius:14px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;text-decoration:none;color:#222;box-shadow:0 2px 8px rgba(0,0,0,.03);cursor:pointer;border:none;}
+    .menu-right{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:700;}
+    .icon{width:38px;height:38px;border-radius:10px;background:#fff0dc;color:#ed7310;display:flex;align-items:center;justify-content:center;font-size:18px;}
+    .arrow{color:#cfcfcf;font-size:20px;}
+    .bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;height:65px;background:#fff;box-shadow:0 -2px 12px rgba(0,0,0,.06);display:grid;grid-template-columns:repeat(4,1fr);z-index:20;}
+    .nav-item{text-decoration:none;color:#999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:10px;font-weight:700;}
+    .nav-item .nav-icon{font-size:20px;}
+    .nav-item.active{color:#ef7410;}
+    .status-dot{width:8px;height:8px;border-radius:50%;display:inline-block;background:#0ab04a;animation:pulse 1.5s infinite}
+    @keyframes pulse{0%{opacity:1}50%{opacity:.4}100%{opacity:1}}
+  </style>
+</head>
+<body>
+<div class="app">
+  <header class="header">
+    <div class="logo-box"><img src="logo-white.png" alt="سهلة"></div>
+    <div style="position:relative;z-index:2;color:white;font-size:12px;display:flex;align-items:center;gap:6px"><span class="status-dot"></span> متصل بالسيرفر</div>
+  </header>
+  <main class="content">
+    <section class="profile-card">
+      <div class="profile-info">
+        <div class="profile-name" id="riderName">جاري التحميل...</div>
+        <div class="role"><span>👤</span><span>مندوب توصيل</span></div>
+        <div class="phone"><span id="riderPhone">--</span><span class="phone-icon">☎</span></div>
+        <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">
+          <span style="background:#fff0dd;color:#ed6f0a;border-radius:12px;padding:2px 8px;font-size:11px;font-weight:800;">الرصيد: <b id="rBalance">--</b> جنيه</span>
+          <span style="background:#e8f8ee;color:#0ab04a;border-radius:12px;padding:2px 8px;font-size:11px;font-weight:800;">الطلبات المستلمه: <b id="rDelivered">0</b></span>
+          <span style="background:#fde8e8;color:#e53935;border-radius:12px;padding:2px 8px;font-size:11px;font-weight:800;">الطلبات الملغاه: <b id="rCancelled">0</b></span>
+        </div>
+      </div>
+      <img class="rider-photo" src="rider.png" alt="صورة المندوب">
+    </section>
+    <section class="menu">
+      <a class="menu-item" href="personal.html"><div class="menu-right"><div class="icon">👤</div><span>البيانات الشخصية</span></div><div class="arrow">‹</div></a>
+      <a class="menu-item" href="orders.html"><div class="menu-right"><div class="icon">📄</div><span>سجل الطلبات</span></div><div class="arrow">‹</div></a>
+      <a class="menu-item" href="earnings.html"><div class="menu-right"><div class="icon">🪙</div><span>الأرباح</span></div><div class="arrow">‹</div></a>
+      <a class="menu-item" href="payment.html"><div class="menu-right"><div class="icon">💳</div><span>طريقة الدفع</span></div><div class="arrow">‹</div></a>
+      <a class="menu-item" href="support.html"><div class="menu-right"><div class="icon">🎧</div><span>مساعدة ودعم</span></div><div class="arrow">‹</div></a>
+      
+      <a class="menu-item" href="https://wwweslamtarek567-netizen.github.io/sahlah-client/" style="background:#FFF6EC;border:1.5px solid #FFD6A8;">
+        <div class="menu-right"><div class="icon" style="background:#FFE4C4;">🔄</div><span style="color:#ff6a00;">تحويل لعميل - افتح تطبيق العميل</span></div><div class="arrow">‹</div>
+      </a>
+
+      <a class="menu-item" href="#" onclick="logout(); return false;"><div class="menu-right"><div class="icon">↪</div><span>تسجيل الخروج</span></div><div class="arrow">‹</div></a>
+    </section>
+  </main>
+</div>
+
+<nav class="bottom-nav">
+  <a class="nav-item active" href="profile.html"><div class="nav-icon">👤</div><div>حسابي</div></a>
+  <a class="nav-item" href="orders.html"><div class="nav-icon">📄</div><div>الطلبات</div></a>
+  <a class="nav-item" href="map.html"><div class="nav-icon">📍</div><div>الموقع</div></a>
+  <a class="nav-item" href="index.html"><div class="nav-icon">🏠</div><div>الرئيسية</div></a>
+</nav>
+
+<script>
+var riderId = localStorage.getItem('riderId') || localStorage.getItem('riderPhone');
+let riderKey = null;
+function cleanP(p){ return String(p||'').replace(/\D/g,'').replace(/^0+/,''); }
+async function syncFromServer(){
+  if(!riderId) { document.getElementById('riderName').innerText='سجل دخول اولاً'; return; }
+  try{
+    const res = await fetch(DB_URL + '/riders.json?t=' + Date.now());
+    const data = await res.json();
+    if(!data) return;
+    let ridersArray = Array.isArray(data) ? data.map((r,i)=>({...r,_key:i})) : Object.entries(data).map(([k,v])=>({...v,_key:k}));
+    let me = ridersArray.find(r=> cleanP(r.phone)==cleanP(riderId) || r.id==riderId || cleanP(r.id)==cleanP(riderId));
+    if(!me){
+      me = { phone: riderId, name: localStorage.getItem('riderName')||'مندوب جديد', balance:50, status:'متاح', orders:0, delivered:0, cancelled:0 };
+      riderKey = cleanP(riderId);
+      await fetch(DB_URL + '/riders/' + riderKey + '.json', { method:'PUT', body: JSON.stringify(me) });
+    } else {
+      riderKey = me._key;
+      localStorage.setItem('riderName', me.name||'مندوب');
+      localStorage.setItem('riderPhone', me.phone);
+      localStorage.setItem('riderBalance', me.balance);
+    }
+    document.getElementById('riderName').innerText = me.name || 'مندوب';
+    document.getElementById('riderPhone').innerText = me.phone || riderId;
+    document.getElementById('rBalance').innerText = parseFloat(me.balance||0).toFixed(2);
+    document.getElementById('rDelivered').innerText = me.delivered ?? me.orders ?? 0;
+    document.getElementById('rCancelled').innerText = me.cancelled ?? 0;
+  }catch(e){
+    document.getElementById('riderName').innerText = localStorage.getItem('riderName')||'مندوب';
+    document.getElementById('riderPhone').innerText = localStorage.getItem('riderPhone')||riderId||'--';
+    document.getElementById('rBalance').innerText = localStorage.getItem('riderBalance')||'50';
+  }
+}
+window.onload = syncFromServer;
+window.onfocus = syncFromServer;
+setInterval(syncFromServer, 5000);
+
+function logout(){ 
+  localStorage.removeItem('riderId'); 
+  localStorage.removeItem('userRole');
+  window.location.href="https://wwweslamtarek567-netizen.github.io/sahlah/"; 
+}
+</script>
+</body>
+    </html>
