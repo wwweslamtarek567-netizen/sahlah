@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تفاصيل الطلب</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="config.js"></script>
+<style>
+body{margin:0;font-family:'Cairo',sans-serif;background:#f7f7f7;}
+.header{background:#ff6a00;color:white;padding:15px;display:flex;justify-content:space-between;align-items:center;border-bottom-left-radius:25px;border-bottom-right-radius:25px;}
+#map{height:35vh;width:100%;z-index:1;}
+.map-badge{position:absolute;z-index:1000;padding:8px 12px;border-radius:15px;font-weight:700;font-size:13px;color:white;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.badge-live{top:15px;right:15px;background:#007bff;}
+.badge-dist{top:15px;left:15px;background:#28a745;}
+.card{background:white;margin:-20px 15px 15px 15px;padding:15px;border-radius:20px;box-shadow:0 4px 15px rgba(0,0,0,0.1);position:relative;z-index:1001;}
+.btn-call,.btn-accept,.btn-picked,.btn-toClient,.btn-deliver{color:white;width:100%;padding:14px;border:none;border-radius:15px;font-family:'Cairo';font-size:17px;font-weight:800;display:flex;justify-content:center;align-items:center;gap:10px;margin:8px 0;cursor:pointer;}
+.btn-call{background:#25D366;}.btn-accept{background:#ff6a00;}.btn-picked{background:#dc3545;}.btn-toClient{background:#007aff;}.btn-deliver{background:#00a651;}
+.items-box{background:#FFF8F0;border:1px dashed #FFC68A;border-radius:12px;padding:10px;margin:10px 0;}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:9999;padding:20px;}
+.modal.show{display:flex;}
+.modal-box{background:white;border-radius:14px;padding:20px;width:100%;max-width:340px;text-align:center;}
+</style>
+</head>
+<body>
+<div class="header"><i class="fa-solid fa-arrow-right" onclick="history.back()"></i><div style="text-align:center;font-size:22px;font-weight:800;">سهلة <span style="font-size:13px;font-weight:400;display:block;">للتوصيل</span></div><i class="fa-solid fa-bars"></i></div>
+<div style="position:relative;"><div id="map"></div><div class="map-badge badge-live" id="badgeLive">جاري تحديد موقعك...</div><div class="map-badge badge-dist" id="badgeDist" style="display:none"></div></div>
+<div class="card">
+  <div id="orderHeader"></div>
+  <div class="items-box" id="itemsBox">جاري التحميل...</div>
+  <div id="clientInfo"></div>
+  <button class="btn-call" onclick="callClient()">📞 اتصال بالعميل</button>
+  <button class="btn-accept" id="bAccept" onclick="acceptOrder()">🏍️ قبول الطلب</button>
+  <button class="btn-picked" id="bPicked" onclick="pickedOrder()" style="display:none">✅ استلمت الطلب (اشتريت الحاجة)</button>
+  <button class="btn-toClient" id="bToClient" onclick="goToClient()" style="display:none">📍 الاتجاه إلى العميل</button>
+  <button class="btn-deliver" id="bDeliver" onclick="deliverOrder()" style="display:none">📦 تم تسليم العميل</button>
+</div>
+<div class="modal" id="successModal"><div class="modal-box"><p id="successText"></p><button onclick="location.href='index.html'" style="margin-top:10px;background:#00a651;color:white;border:none;border-radius:10px;padding:10px 25px;font-family:'Cairo';font-weight:800;">موافق</button></div></div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+var orderData=null, clientPhoneNumber='', clientLat=null, clientLng=null, myLat=null, myLng=null, myMarker=null, clientMarker=null, riderId=localStorage.getItem('riderId')||localStorage.getItem('riderPhone')||'مندوب';
+const params=new URLSearchParams(window.location.search); const orderId=params.get('id');
+var map=L.map('map',{zoomControl:false}).setView([30.0444,31.2357],13); L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(map);
+
+function calcDist(a,b,c,d){var R=6371;var dLat=(c-a)*Math.PI/180;var dLon=(d-b)*Math.PI/180;var x=Math.sin(dLat/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dLon/2)**2;return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));}
+
+async function loadOrder(){
+  if(!orderId) return;
+  let res=await fetch(DB_URL+'/orders/'+orderId+'.json'); let data=await res.json();
+  if(!data) return;
+  orderData=data; clientPhoneNumber=data.clientPhone||'';
+  clientLat=parseFloat(data.lat||data.clientLat||0)||null; clientLng=parseFloat(data.lng||data.clientLng||0)||null;
+  document.getElementById('orderHeader').innerHTML=`<div style="display:flex;justify-content:space-between"><span style="background:#ff6a00;color:#fff;padding:6px 12px;border-radius:20px">${data.type||'طلب'}</span><b>${data.total||30} جنيه</b></div>`;
+  document.getElementById('clientInfo').innerHTML=`<h3>${data.clientName||'عميل'}</h3><p>${clientPhoneNumber}</p><p>${data.clientAddress||''}</p>`;
+  document.getElementById('itemsBox').innerHTML='<b>📦 المطلوب:</b><br>'+(data.items||[]).map(i=>`• ${i.name||i}`).join('<br>');
+  if(clientLat&&clientLng){
+    clientMarker=L.marker([clientLat,clientLng]).addTo(map);
+    if(!myLat) map.setView([clientLat,clientLng],15);
+  }
+  updateButtons(data.status);
+  tryUpdateDist();
+}
+function updateButtons(status){
+  let s = (status||'').toLowerCase();
+  let isPending = s=='pending' || s=='جديد' || s=='new' || s=='';
+  document.getElementById('bAccept').style.display = isPending?'flex':'none';
+  document.getElementById('bPicked').style.display = s=='accepted'?'flex':'none';
+  document.getElementById('bToClient').style.display = s=='purchased'?'flex':'none';
+  document.getElementById('bDeliver').style.display = s=='on_the_way'?'flex':'none';
+}
+function callClient(){ if(clientPhoneNumber) window.location.href='tel:'+clientPhoneNumber; }
+async function acceptOrder(){
+  let courier = { name: localStorage.getItem('riderName')||'مندوب سهلة', phone: localStorage.getItem('riderPhone')||riderId };
+  await fetch(DB_URL+'/orders/'+orderId+'.json',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:'accepted', courier: courier})});
+  alert('تم قبول الطلب - بياناتك ظهرت عند العميل');
+  updateButtons('accepted');
+}
+async function pickedOrder(){
+  await fetch(DB_URL+'/orders/'+orderId+'.json',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:'purchased'})});
+  updateButtons('purchased');
+}
+async function goToClient(){
+  await fetch(DB_URL+'/orders/'+orderId+'.json',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:'on_the_way'})});
+  if(clientLat) window.open(`https://www.google.com/maps/dir/?api=1&destination=${clientLat},${clientLng}`,'_blank');
+  updateButtons('on_the_way');
+}
+async function deliverOrder(){
+  await fetch(DB_URL+'/orders/'+orderId+'.json',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:'delivered', deliveredAt: new Date().toISOString()})});
+  document.getElementById('successText').innerText='✓ تم تسليم الطلب\nشكرا ليك';
+  document.getElementById('successModal').classList.add('show');
+}
+
+// === تحديد موقعي الحالي ===
+function tryUpdateDist(){
+  if(myLat && clientLat){
+    let d = calcDist(myLat, myLng, clientLat, clientLng);
+    document.getElementById('badgeDist').style.display='block';
+    document.getElementById('badgeDist').innerText = `📏 ${d.toFixed(1)} كم للعميل`;
+  }
+}
+function updateMyLocation(lat, lng){
+  myLat = lat; myLng = lng;
+  if(!myMarker){
+    myMarker = L.marker([lat,lng],{
+      icon: L.divIcon({html:'<div style="background:#007bff;width:18px;height:18px;border-radius:50%;border:3px solid white;box-shadow:0 0 10px rgba(0,0,0,.3)"></div>',iconSize:[18,18]})
+    }).addTo(map);
+    map.setView([lat,lng],15);
+  } else {
+    myMarker.setLatLng([lat,lng]);
+  }
+  document.getElementById('badgeLive').innerText = '📍 موقعك الحالي';
+  tryUpdateDist();
+}
+
+if(navigator.geolocation){
+  navigator.geolocation.getCurrentPosition(
+    p => updateMyLocation(p.coords.latitude, p.coords.longitude),
+    err => {
+      document.getElementById('badgeLive').innerText = '⚠️ فعّل الـ GPS';
+      document.getElementById('badgeLive').style.background='#dc3545';
+    },
+    {enableHighAccuracy:true, timeout:15000}
+  );
+  navigator.geolocation.watchPosition(
+    p => updateMyLocation(p.coords.latitude, p.coords.longitude),
+    null,
+    {enableHighAccuracy:true, maximumAge:0}
+  );
+}
+
+loadOrder();
+</script>
+</body>
+  </html>
