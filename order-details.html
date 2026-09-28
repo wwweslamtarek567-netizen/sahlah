@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تفاصيل الطلب</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="config.js"></script>
+<style>
+body{margin:0;font-family:'Cairo',sans-serif;background:#f7f7f7;}
+.header{background:#ff6a00;color:white;padding:15px;display:flex;justify-content:space-between;align-items:center;border-bottom-left-radius:25px;border-bottom-right-radius:25px;}
+.header i{font-size:20px;cursor:pointer;}
+.logo{text-align:center;font-size:22px;font-weight:800;}
+.logo span{font-size:13px;font-weight:400;display:block;}
+#map{height:35vh;width:100%;z-index:1;}
+.map-badge{position:absolute;z-index:1000;padding:8px 12px;border-radius:15px;font-weight:700;font-size:13px;color:white;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.badge-live{top:15px;right:15px;background:#007bff;}
+.badge-dist{top:15px;left:15px;background:#28a745;}
+.card{background:white;margin:-20px 15px 15px 15px;padding:15px;border-radius:20px;box-shadow:0 4px 15px rgba(0,0,0,0.1);position:relative;z-index:1001;}
+.tag{background:#ff6a00;color:white;padding:8px 15px;border-radius:25px;display:inline-flex;align-items:center;gap:8px;font-weight:700;}
+.price{float:left;text-align:left;}
+.price.km{font-size:13px;color:#666;}
+.price.amount{font-size:26px;font-weight:800;}
+.info{display:flex;gap:15px;margin:15px 0;}
+.info-main{flex:1;}
+.info-main h3{margin:5px 0;font-size:17px;display:flex;align-items:center;gap:8px;}
+.info-main p{margin:8px 0;color:#666;font-size:13px;line-height:1.5;}
+.client{text-align:center;border-right:1px solid #eee;padding-right:15px;min-width:70px;}
+.client img{width:60px;height:60px;border-radius:50%;background:#ddd;}
+.client .rate{color:#ffc107;font-weight:700;}
+.call-link{background:#e6f4ff;color:#007aff;padding:8px 12px;border-radius:10px;font-weight:900;text-decoration:none;display:inline-flex;align-items:center;gap:6px;border:1px dashed #007aff}
+.btn-call,.btn-accept,.btn-picked,.btn-toClient,.btn-deliver{color:white;width:100%;padding:14px;border:none;border-radius:15px;font-family:'Cairo';font-size:17px;font-weight:800;display:flex;justify-content:center;align-items:center;gap:10px;margin:8px 0;cursor:pointer;}
+.btn-call{background:#25D366;}.btn-accept{background:#ff6a00;}.btn-picked{background:#dc3545;}.btn-toClient{background:#007aff;}.btn-deliver{background:#00a651;}
+.items-box{background:#FFF8F0;border:1px dashed #FFC68A;border-radius:12px;padding:10px;margin:10px 0;}
+.items-box b{font-size:13px;color:#ff6a00}
+.item-row{display:flex;gap:12px;align-items:center;background:#fff;border-radius:12px;padding:10px;margin:10px 0;border:1px solid #FFE0B8}
+.item-row img.drug-img{width:90px;height:90px;object-fit:cover;border-radius:12px;border:2px solid #FFD6A8;flex-shrink:0;background:#fff}
+.suggest{text-align:center;margin:15px 0;font-weight:700;font-size:14px;color:#666;cursor:pointer;}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:9999;padding:20px;}
+.modal.show{display:flex;}
+.modal-box{background:white;border-radius:14px;padding:20px;width:100%;max-width:340px;text-align:center;}
+.modal-box p{white-space:pre-line;line-height:2;font-weight:800;font-size:14px;}
+</style>
+</head>
+<body>
+<div class="header"><i class="fa-solid fa-arrow-right" onclick="history.back()"></i><div class="logo">سهلة <span>للتوصيل</span></div><i class="fa-solid fa-bars"></i></div>
+<div style="position:relative;"><div id="map"></div><div class="map-badge badge-live" id="badgeLive">📍 جاري تحديد موقعك...</div><div class="map-badge badge-dist" id="badgeDist" style="display:none"></div></div>
+<div class="card">
+  <div style="display:flex;justify-content:space-between;align-items:start;"><div class="tag"><i class="fa-solid fa-basket-shopping"></i> <span id="orderTypeText">صيدلية</span></div><div class="price"><div class="km"><i class="fa-regular fa-clock"></i> <span id="distKm">--</span></div><div class="amount"><span id="orderPrice">0</span> جنيه</div></div></div>
+  <div class="items-box" id="itemsBox"><b>📦 المطلوب:</b><br>جاري التحميل...</div>
+  <div class="info"><div class="info-main"><h3 id="clientNameH">جاري التحميل...</h3><p id="clientPhoneP"></p><p id="clientAddrP">العنوان:...</p><p id="myLocationText" style="color:#007bff;font-weight:800;font-size:12px;margin-top:8px"><i class="fa-solid fa-crosshairs"></i> موقعك: جاري التحديد...</p></div><div class="client"><img id="clientAvatar" src="https://ui-avatars.com/api/?name=عميل&background=E0E0E0&color=333"><div style="font-weight:700;" id="clientShortName">العميل</div><div class="rate">4.9 <i class="fa-solid fa-star"></i></div><div style="font-size:11px;color:#666;" id="orderIdText">ID</div></div></div>
+  <button class="btn-call" id="bCall" onclick="callClient()"><i class="fa-solid fa-phone"></i> اتصال بالعميل</button>
+  <button class="btn-accept" id="bAccept" onclick="acceptOrder()"><i class="fa-solid fa-motorcycle"></i> قبول الطلب</button>
+  <button class="btn-picked" id="bPicked" onclick="pickedOrder()" style="display:none"><i class="fa-solid fa-circle-check"></i> استلمت الطلب (اشتريت الحاجة)</button>
+  <button class="btn-toClient" id="bToClient" onclick="goToClient()" style="display:none"><i class="fa-solid fa-location-arrow"></i> الاتجاه الى العميل</button>
+  <button class="btn-deliver" id="bDeliver" onclick="deliverOrder()" style="display:none"><i class="fa-solid fa-box"></i> تم تسليم الطلب</button>
+  <div class="suggest" onclick="suggestFee()">اقترح أجرك</div>
+</div>
+<div class="modal" id="successModal"><div class="modal-box"><p id="successText"></p><button onclick="localStorage.setItem('lastDeliveryTime', Date.now()); localStorage.removeItem('current_rider_order_id'); localStorage.removeItem('current_order_id'); location.href='orders.html?delivered=1'" style="margin-top:10px;background:#00a651;color:white;border:none;border-radius:10px;padding:10px 25px;font-family:'Cairo';font-weight:800;">موافق</button></div></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+var orderFee=0, riderId=localStorage.getItem('riderId')||localStorage.getItem('riderPhone')||'01023284996', riderKey=null, riderPhoneClean=null, currentBalance=0, currentDelivered=0, orderData=null, clientPhoneNumber='', clientLat=null, clientLng=null, myLat=null, myLng=null, myMarker=null, clientMarker=null, polyLine=null, offerWatcher=null;
+function cleanP(p){return String(p||'').replace(/\D/g,'');}
+const params=new URLSearchParams(window.location.search); const orderId=params.get('id');
+var map=L.map('map',{zoomControl:false}).setView([30.0444,31.2357],13); L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(map);
+function calcDist(lat1,lon1,lat2,lon2){var R=6371;var dLat=(lat2-lat1)*Math.PI/180;var dLon=(lon2-lon1)*Math.PI/180;var a=Math.sin(dLat/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));}
+
+async function loadOrder(){
+  if(!orderId){alert('رقم الطلب غير موجود');return;}
+  try{
+    let res=await fetch(DB_URL+'/orders/'+orderId+'.json?t='+Date.now()); let data=await res.json();
+    if(!data){alert('الطلب غير موجود');return;}
+    orderData=data; orderFee=parseFloat(data.total||30); clientPhoneNumber=data.clientPhone||data.phone||'';
+    document.getElementById('orderPrice').innerText=orderFee;
+    document.getElementById('orderTypeText').innerText=data.type||'صيدلية';
+    document.getElementById('clientNameH').innerHTML=(data.clientName||'عميل')+' <i class="fa-solid fa-user" style="color:#ff6a00;"></i>';
+    document.getElementById('clientShortName').innerText=data.clientName||'العميل';
+    document.getElementById('clientPhoneP').innerHTML=`<a class="call-link" href="tel:${clientPhoneNumber}"><i class="fa-solid fa-phone"></i> ${clientPhoneNumber} - اضغط للاتصال</a>`;
+    document.getElementById('clientAddrP').innerHTML='<i class="fa-solid fa-location-dot"></i> '+(data.clientAddress||data.address||'بدون عنوان');
+    document.getElementById('orderIdText').innerText='طلب #'+(data.id||orderId);
+    document.getElementById('clientAvatar').src='https://ui-avatars.com/api/?name='+encodeURIComponent(data.clientName||'عميل')+'&background=FF6A00&color=fff';
+    function getLocalImg(name){
+      let n=(name||'').toLowerCase();
+      if(n.includes('باي')||n.includes('bay')||n.includes('كوفان')) return 'bay.jpg';
+      if(n.includes('بنادول')||n.includes('panadol')) return 'panadol.jpg';
+      if(n.includes('كيناكومب')||n.includes('kenacomb')) return 'kenacomb.jpg';
+      if(n.includes('ميبو')||n.includes('mebo')) return 'mebo.jpg';
+      return null;
+    }
+    let items=data.items||[];
+    let html='<b>📦 المطلوب:</b>';
+    html+=items.map(i=>{
+      let name=i.name||'منتج';
+      let imgSrc=i.img&&i.img.startsWith('data:')?i.img:(getLocalImg(name)||i.img||'');
+      if(imgSrc) return `<div class="item-row"><img src="${imgSrc}" class="drug-img" onerror="this.style.display='none'"><div style="font-weight:800;font-size:13px">• ${name}</div></div>`;
+      else return `<div class="item-row"><div style="font-weight:800;font-size:13px">• ${name}</div></div>`;
+    }).join('');
+    document.getElementById('itemsBox').innerHTML=html;
+    clientLat=data.lat||data.clientLat||data.latitude||null; clientLng=data.lng||data.clientLng||data.longitude||null;
+    if(!clientLat&&data.location){clientLat=data.location.lat; clientLng=data.location.lng||data.location.lon;}
+    if(clientLat&&clientLng){clientLat=parseFloat(clientLat); clientLng=parseFloat(clientLng); if(clientMarker) map.removeLayer(clientMarker); clientMarker=L.marker([clientLat,clientLng]).addTo(map).bindPopup("العميل"); if(!myLat) map.setView([clientLat,clientLng],15);}
+    updateButtons(data.status);
+
+    // لو انا كنت مقدم عرض قبل كده
+    if(localStorage.getItem('my_offer_'+orderId) || (data.offers && data.offers[riderPhoneClean])){
+      document.getElementById('bAccept').innerHTML='<i class="fa-solid fa-clock"></i> في انتظار اختيار العميل...';
+      document.getElementById('bAccept').disabled=true;
+      document.getElementById('bAccept').style.background='#ff9800';
+      startOfferWatcher();
+    }
+
+    // لو العميل اختار مندوب تاني وانا مش هو
+    if(data.courier && data.courier.phone && cleanP(data.courier.phone)!==riderPhoneClean && (localStorage.getItem('my_offer_'+orderId) || (data.offers && data.offers[riderPhoneClean]))){
+      alert('للاسف العميل اختار مندوب تاني');
+      localStorage.removeItem('my_offer_'+orderId);
+      localStorage.removeItem('current_rider_order_id');
+      location.href='orders.html?rejected=1';
+      return;
+    }
+
+    tryUpdateDist();
+  }catch(e){console.log(e);}
+}
+
+function updateButtons(status){
+  let s=String(status||'').toLowerCase();
+  let isPending=s=='pending'||s=='جديد'||s=='new'||s==''||!s;
+  let isAccepted=s=='accepted'||s=='تم القبول';
+  let isPurchased=s=='purchased'||s=='تم الاستلام';
+  let isOnWay=s=='on_the_way';
+  let isDelivered=s=='delivered'||s=='تم التوصيل';
+
+  // لو العميل اختارني انا اعتبره accepted حتى لو لسه pending في الستاتس القديم
+  if(orderData && orderData.courier && cleanP(orderData.courier.phone)===riderPhoneClean){
+    isPending=false; isAccepted=true;
+  }
+
+  document.getElementById('bCall').style.display='flex';
+  let alreadyOffered = localStorage.getItem('my_offer_'+orderId);
+  document.getElementById('bAccept').style.display=isPending && !alreadyOffered?'flex':(alreadyOffered?'flex':'none');
+  if(alreadyOffered && isPending){
+    document.getElementById('bAccept').innerHTML='<i class="fa-solid fa-clock"></i> في انتظار اختيار العميل...';
+    document.getElementById('bAccept').disabled=true;
+    document.getElementById('bAccept').style.background='#ff9800';
+  }
+  document.getElementById('bPicked').style.display=isAccepted?'flex':'none';
+  document.getElementById('bToClient').style.display=isPurchased?'flex':'none';
+  document.getElementById('bDeliver').style.display=isOnWay?'flex':'none';
+  if(isDelivered){
+    document.getElementById('bAccept').style.display='none';
+    document.getElementById('bPicked').style.display='none';
+    document.getElementById('bToClient').style.display='none';
+    document.getElementById('bDeliver').style.display='none';
+  }
+}
+
+function callClient(){if(!clientPhoneNumber){alert('رقم العميل غير موجود');return;} window.location.href='tel:'+clientPhoneNumber;}
+
+function tryUpdateDist(){
+  if(myLat&&clientLat){
+    let d=calcDist(myLat,myLng,clientLat,clientLng);
+    document.getElementById('distKm').innerText=d.toFixed(1)+' كم للعميل';
+    document.getElementById('badgeDist').style.display='block';
+    document.getElementById('badgeDist').innerHTML=`${d.toFixed(1)} كم<br>للوصول`;
+    if(polyLine) map.removeLayer(polyLine);
+    polyLine=L.polyline([[myLat,myLng],[clientLat,clientLng]],{color:'#007bff',weight:4,dashArray:'6,6'}).addTo(map);
+  }
+}
+
+function updateMyLocation(lat,lng){
+  myLat=lat; myLng=lng;
+  document.getElementById('myLocationText').innerHTML=`<i class="fa-solid fa-circle-dot"></i> موقعك: ${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+  document.getElementById('badgeLive').innerHTML=`<i class="fa-solid fa-location-crosshairs"></i> موقعك الحالي`;
+  if(myMarker) map.removeLayer(myMarker);
+  var icon=L.icon({iconUrl:'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',shadowUrl:'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',iconSize:[25,41],iconAnchor:[12,41],popupAnchor:[1,-34],shadowSize:[41,41]});
+  myMarker=L.marker([lat,lng],{icon:icon}).addTo(map).bindPopup("📍 انت هنا").openPopup();
+  if(clientLat&&clientLng){ map.fitBounds([[lat,lng],[clientLat,clientLng]],{padding:[40,40]}); }
+  else { map.setView([lat,lng],15); }
+  tryUpdateDist();
+  if(riderKey){
+    fetch(DB_URL+'/riders/'+riderKey+'.json',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({lat:lat,lng:lng,lastUpdate:Date.now()})});
+  }
+  if(orderId){
+    fetch(DB_URL+'/orders/'+orderId+'.json',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({riderLat:lat,riderLng:lng})});
+    // لو انا مقدم عرض حدث موقعي في العرض برضه
+    if(riderPhoneClean && localStorage.getItem('my_offer_'+orderId)){
+      fetch(DB_URL+'/orders/'+orderId+'/offers/'+riderPhoneClean+'.json',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({lat:lat,lng:lng})});
+    }
+  }
+}
+
+if(navigator.geolocation){
+  navigator.geolocation.getCurrentPosition(pos=>{updateMyLocation(pos.coords.latitude,pos.coords.longitude);},err=>{document.getElementById('badgeLive').innerText='⚠️ فعّل الـ GPS'; document.getElementById('badgeLive').style.background='#dc3545';},{enableHighAccuracy:true,timeout:15000});
+  navigator.geolocation.watchPosition(pos=>{updateMyLocation(pos.coords.latitude,pos.coords.longitude);},null,{enableHighAccuracy:true,maximumAge:0});
+}
+
+async function loadRider(){
+  riderPhoneClean = cleanP(localStorage.getItem('riderPhone')||riderId);
+  try{
+    let res=await fetch(DB_URL+'/riders.json?t='+Date.now()); let data=await res.json(); if(!data) return;
+    let list=Object.entries(data).map(([k,v])=>({...v,_key:k}));
+    let me=list.find(r=>cleanP(r.phone)==riderPhoneClean||r.id==riderId);
+    if(me){riderKey=me._key; currentBalance=parseFloat(me.balance||0); currentDelivered=parseInt(me.delivered||0);}
+  }catch(e){}
+}
+
+// === الدالة الجديدة اللي بتبعت عرض للعميل ===
+async function acceptOrder(){
+  if(!riderPhoneClean) await loadRider();
+  if(!myLat){ alert('استنى لما نحدد موقعك الاول'); return; }
+
+  let courierName = localStorage.getItem('riderName')||'مندوب سهلة';
+  let offer = {
+    name: courierName,
+    phone: riderPhoneClean,
+    lat: myLat,
+    lng: myLng,
+    fee: orderFee,
+    time: Date.now()
+  };
+
+  await fetch(DB_URL+'/orders/'+orderId+'/offers/'+riderPhoneClean+'.json',{
+    method:'PUT',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify(offer)
+  });
+
+  localStorage.setItem('my_offer_'+orderId, '1');
+  localStorage.setItem('current_rider_order_id', orderId);
+  localStorage.setItem('current_order_id', orderId);
+
+  document.getElementById('bAccept').innerHTML='✅ تم ارسال عرضك - انتظر اختيار العميل';
+  document.getElementById('bAccept').disabled=true;
+  document.getElementById('bAccept').style.background='#888';
+
+  startOfferWatcher();
+}
+
+function startOfferWatcher(){
+  if(offerWatcher) clearInterval(offerWatcher);
+  offerWatcher = setInterval(async ()=>{
+    try{
+      let res = await fetch(DB_URL+'/orders/'+orderId+'.json?t='+Date.now());
+      let o = await res.json();
+      if(!o) return;
+      orderData=o;
+
+      if(o.courier && o.courier.phone){
+        let chosen = cleanP(o.courier.phone);
+        if(chosen===riderPhoneClean){
+          clearInterval(offerWatcher);
+          alert('مبروك! العميل اختارك 🎉');
+          updateButtons('accepted');
+          document.getElementById('bAccept').style.display='none';
+        }else{
+          clearInterval(offerWatcher);
+          alert('للاسف العميل اختار مندوب تاني');
+          localStorage.removeItem('my_offer_'+orderId);
+          localStorage.removeItem('current_rider_order_id');
+          localStorage.removeItem('current_order_id');
+          location.href='orders.html?rejected=1';
+        }
+      }
+    }catch(e){}
+  }, 3000);
+}
+
+async function pickedOrder(){
+  await fetch(DB_URL+'/orders/'+orderId+'.json',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:'purchased'})});
+  updateButtons('purchased');
+}
+async function goToClient(){
+  if(!clientLat||!clientLng){alert('مفيش لوكيشن للعميل');return;}
+  await fetch(DB_URL+'/orders/'+orderId+'.json',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:'on_the_way'})});
+  if(myLat&&myLng) window.open(`https://www.google.com/maps/dir/?api=1&origin=${myLat},${myLng}&destination=${clientLat},${clientLng}`,'_blank');
+  else window.open(`https://www.google.com/maps/dir/?api=1&destination=${clientLat},${clientLng}`,'_blank');
+  updateButtons('on_the_way');
+}
+function suggestFee(){let n=prompt('اقترح اجرة التوصيل:',orderFee); if(n){orderFee=parseFloat(n); document.getElementById('orderPrice').innerText=orderFee;}}
+async function deliverOrder(){
+  if(!riderId){location.href='register.html';return;}
+  await loadRider();
+  let commission=orderFee*0.15;
+  let oldBal=currentBalance;
+  let newBal=oldBal-commission;
+  let newDel=currentDelivered+1;
+  if(newBal<-100){alert('رصيدك لا يكفي: '+oldBal.toFixed(2)+'\nالمطلوب: '+commission.toFixed(2));return;}
+  try{
+    if(riderKey){ await fetch(DB_URL+'/riders/'+riderKey+'.json',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({balance:parseFloat(newBal.toFixed(2)),delivered:newDel})}); }
+    await fetch(DB_URL+'/orders/'+orderId+'.json',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:'delivered',riderId:riderId,deliveredAt:new Date().toISOString()})});
+  }catch(e){}
+  localStorage.setItem('riderBalance',newBal);
+  let msg=`✓ تم التسليم\n\nخصم ${commission.toFixed(2)}ج عمولة 15%\nرصيدك: ${oldBal.toFixed(2)} -> ${newBal.toFixed(2)}\nالطلبات المستلمة: ${newDel}`;
+  document.getElementById('successText').innerText=msg;
+  document.getElementById('successModal').classList.add('show');
+}
+
+loadOrder(); loadRider();
+</script>
+</body>
+  </html>
