@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تفاصيل الطلب - مندوب</title>
+<script src="config.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+body{margin:0;font-family:'Cairo';background:#f5f5f5}
+.top{ background:#ff6a00; color:white; padding:12px; text-align:center; font-weight:900 }
+#map{ height:40vh }
+.card{ background:white; margin:12px; border-radius:18px; padding:14px }
+.btn{ width:100%; padding:14px; border:none; border-radius:30px; font-family:'Cairo'; font-weight:900; margin-top:10px; cursor:pointer }
+.green{ background:#0a9e3f; color:white } .red{ background:#d00; color:white } .blue{ background:#0066ff; color:white }
+.badge{ display:inline-block; background:#ff6a00; color:white; padding:4px 10px; border-radius:20px; font-weight:900; font-size:12px }
+</style>
+</head>
+<body>
+<div class="top">تفاصيل الطلب - <span id="fee">30</span> جنيه</div>
+<div id="map"></div>
+<div class="card" id="card">جاري التحميل...</div>
+
+<script>
+const orderId = new URLSearchParams(location.search).get('id');
+let map, order;
+function init(lat,lng){ map = L.map('map').setView([lat,lng],13); L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map); }
+
+async function load(){
+  let res = await fetch(DB_URL+'/orders/'+orderId+'.json'); let o = await res.json(); order=o;
+  if(!o) return;
+  document.getElementById('fee').innerText = o.fee||30;
+  let plat=o.pickupLat||o.fromLat, plng=o.pickupLng||o.fromLng, dlat=o.dropoffLat||o.toLat, dlng=o.dropoffLng||o.toLng;
+  if(!map) init(plat,plng);
+  map.eachLayer(l=>{ if(l instanceof L.Marker||l instanceof L.Polyline) map.removeLayer(l); });
+  L.marker([plat,plng]).addTo(map).bindPopup('استلام'); L.marker([dlat,dlng]).addTo(map).bindPopup('تسليم');
+  L.polyline([[plat,plng],[dlat,dlng]], {color:'#0066ff', dashArray:'10,10', weight:5}).addTo(map);
+  map.fitBounds([[plat,plng],[dlat,dlng]], {padding:[40,40]});
+
+  let st = o.status||'accepted';
+  document.getElementById('card').innerHTML = `
+    <div><span class="badge">${o.fee||30} جنيه</span> - ${o.senderName||'عميل'} ⭐ 4.9</div>
+    <div style="margin-top:8px;font-size:13px;font-weight:700">📍 من: ${o.pickupAddress||o.fromAddress}</div>
+    <div style="font-size:13px;font-weight:700">🏁 الى: ${o.dropoffAddress||o.toAddress}</div>
+    <div style="font-size:12px;color:#666">📞 ${o.senderPhone||''}</div>
+    
+    <button class="btn green" onclick="location.href='tel:${o.senderPhone}'">📞 اتصال بالعميل</button>
+    ${st=='accepted' ? `<button class="btn red" onclick="pickup()">📦 تم استلام الطرد</button>` : ''}
+    ${st=='picked' ? `<button class="btn blue" onclick="deliver()">✅ تم تسليم الطرد</button>` : ''}
+    <button class="btn blue" style="background:#eee;color:#333" onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${st=='accepted'?plat+','+plng : dlat+','+dlng}')">🗺 فتح الطريق</button>
+    <div style="text-align:center;margin-top:8px;color:#999;font-size:12px">افترض احداث</div>
+  `;
+}
+async function pickup(){ await fetch(DB_URL+'/orders/'+orderId+'.json',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:'picked'})}); load(); }
+async function deliver(){ await fetch(DB_URL+'/orders/'+orderId+'.json',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:'delivered'})}); alert('تم التوصيل بنجاح'); location.href='orders.html'; }
+
+load(); setInterval(load,6000);
+</script>
+</body>
+  </html>
