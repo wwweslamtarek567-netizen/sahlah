@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تفاصيل الطلب - مندوب</title>
+<script src="config.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+body{margin:0;font-family:'Cairo';background:#f5f5f5}
+.top{ background:#ff6a00; color:white; padding:12px; text-align:center; font-weight:900 }
+#map{ height:40vh }
+.card{ background:white; margin:12px; border-radius:18px; padding:14px }
+.btn{ width:100%; padding:14px; border:none; border-radius:30px; font-family:'Cairo'; font-weight:900; margin-top:10px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px }
+.green{ background:#0a9e3f; color:white } 
+.red{ background:#d00; color:white } 
+.blue{ background:#0066ff; color:white }
+.pink{ background:#ff2d92; color:white }
+.badge{ display:inline-block; background:#ff6a00; color:white; padding:4px 10px; border-radius:20px; font-weight:900; font-size:12px }
+</style>
+</head>
+<body>
+<div class="top">تفاصيل الطلب - <span id="fee">30</span> جنيه - <span id="stText">جاري التحميل</span></div>
+<div id="map"></div>
+<div class="card" id="card">جاري التحميل...</div>
+
+<script>
+const orderId = new URLSearchParams(location.search).get('id') || localStorage.getItem('current_rider_order_id');
+function clean(p){return String(p||'').replace(/\D/g,'');}
+let riderKey = clean(localStorage.getItem('riderPhone')||'');
+let map, order;
+
+function init(lat,lng){ 
+  map = L.map('map').setView([lat,lng],13); 
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map); 
+}
+
+async function load(){
+  let res = await fetch(DB_URL+'/orders/'+orderId+'.json'); 
+  let o = await res.json(); 
+  if(!o){ document.getElementById('card').innerHTML='الطلب غير موجود'; return; }
+  order=o;
+  document.getElementById('fee').innerText = o.fee||o.total||30;
+  document.getElementById('stText').innerText = {accepted:'تم القبول', picked:'تم الاستلام - في الطريق', on_the_way:'في الطريق', delivered:'تم التسليم'}[o.status]||o.status;
+
+  let plat=o.pickupLat||o.fromLat, plng=o.pickupLng||o.fromLng, dlat=o.dropoffLat||o.toLat, dlng=o.dropoffLng||o.toLng;
+  if(!plat) plat=30.0444; if(!plng) plng=31.2357;
+  if(!dlat) dlat=30.05; if(!dlng) dlng=31.24;
+  if(!map) init(plat,plng);
+  map.eachLayer(l=>{ if(l instanceof L.Marker||l instanceof L.Polyline) map.removeLayer(l); });
+  L.marker([plat,plng]).addTo(map).bindPopup('استلام'); 
+  L.marker([dlat,dlng]).addTo(map).bindPopup('تسليم');
+  L.polyline([[plat,plng],[dlat,dlng]], {color:o.status=='picked'?'#0066ff':'#ff2d92', dashArray:'10,10', weight:5}).addTo(map);
+  map.fitBounds([[plat,plng],[dlat,dlng]], {padding:[40,40]});
+
+  let st = o.status||'accepted';
+  let isPickup = st=='accepted';
+  let roadLat = isPickup? plat : dlat;
+  let roadLng = isPickup? plng : dlng;
+  let roadBtnClass = isPickup? 'pink' : 'blue';
+  let roadBtnText = isPickup? '📍 فتح الطريق لاستلام الطرد' : '🚚 فتح الطريق لتسليم الطرد';
+
+  document.getElementById('card').innerHTML = `
+    <div><span class="badge">${o.fee||o.total||30} جنيه</span> - ${o.senderName||o.clientName||'عميل'} ⭐ 4.9</div>
+    <div style="margin-top:8px;font-size:13px;font-weight:700">📍 من: ${o.pickupAddress||o.fromAddress}</div>
+    <div style="font-size:13px;font-weight:700">🏁 الى: ${o.dropoffAddress||o.toAddress}</div>
+    <div style="font-size:12px;color:#666">📞 ${o.senderPhone||o.clientPhone||''}</div>
+    <div style="margin-top:6px;font-size:12px;color:#0a9e3f;font-weight:800">الحالة: ${document.getElementById('stText').innerText} - العميل شايفها دلوقتي في صفحة التتبع</div>
+    
+    <button class="btn green" onclick="location.href='tel:${o.senderPhone||o.clientPhone}'">📞 اتصال بالعميل</button>
+    ${st=='accepted' ? `<button class="btn red" onclick="pickup()">📦 تم استلام الطرد</button>` : ''}
+    ${st=='picked' || st=='on_the_way' ? `<button class="btn blue" onclick="deliver()">✅ تم تسليم الطرد - سيخصم 15%</button>` : ''}
+    <button class="btn ${roadBtnClass}" onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${roadLat},${roadLng}')">🗺 ${roadBtnText}</button>
+  `;
+}
+
+async function pickup(){ 
+  // يربط مع تتبع العميل
+  await fetch(DB_URL+'/orders/'+orderId+'.json',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:'picked', pickedAt:Date.now()})}); 
+  load(); 
+}
+
+async function deliver(){ 
+  let fee = parseFloat(order.fee||order.total||30);
+  let commission = fee * 0.15;
+  if(!confirm(`هيتم خصم العمولة ${commission.toFixed(0)} ج (15%) من رصيدك\nمتأكد انك سلمت؟`)) return;
+
+  // 1- خصم من الرصيد
+  try{
+    let rRes = await fetch(DB_URL+'/riders/'+riderKey+'.json');
+    let rData = await rRes.json();
+    let oldBal = parseFloat(rData?.balance ?? localStorage.getItem('riderBalance') ?? 0);
+    let newBal = oldBal - commission;
+    if(newBal<0) newBal=0;
+    await fetch(DB_URL+'/riders/'+riderKey+'/balance.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(newBal)});
+    localStorage.setItem('riderBalance', newBal);
+  }catch(e){ console.log('balance error',e); }
+
+  // 2- تحديث حالة الطلب - العميل هيشوفها في صفحة التتبع
+  await fetch(DB_URL+'/orders/'+orderId+'.json',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+    status:'delivered',
+    deliveredAt:Date.now(),
+    commissionPaid:commission
+  })}); 
+  alert('تم التوصيل بنجاح وتم خصم '+commission.toFixed(0)+' ج'); 
+  localStorage.removeItem('current_rider_order_id');
+  location.href='orders.html'; 
+}
+
+load(); setInterval(load,4000);
+</script>
+</body>
+  </html>
