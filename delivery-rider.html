@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>طلبات التوصيل - سهلة</title>
+<script src="config.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+body{margin:0;font-family:'Cairo';background:#f0f0f0;padding-bottom:90px;transition:.3s}
+body.no-balance{filter:grayscale(1);pointer-events:none}
+.header{background:#ff6a00;padding:12px;text-align:center;color:white;font-weight:900;font-size:18px;position:sticky;top:0;z-index:10}
+.top-bar{display:flex;justify-content:space-between;padding:10px 15px;background:white;font-weight:800;font-size:14px}
+.order-card{background:white;margin:12px;border-radius:20px;padding:16px;box-shadow:0 3px 10px rgba(0,0,0,.06)}
+.card-top{display:flex;justify-content:space-between;align-items:center}
+.price-badge{font-weight:900;font-size:15px;color:#ff6a00}
+.time-badge{background:#f5f5f5;padding:5px 10px;border-radius:12px;font-size:12px;font-weight:800;display:flex;align-items:center;gap:4px}
+.pkg-icon{text-align:center;margin:10px 0;font-size:26px;color:#ff6a00}
+.client-line{display:flex;justify-content:space-between;align-items:center;margin:6px 0;font-weight:800;font-size:14px;color:#111}
+.addr{color:#555;font-size:13px;margin:4px 0;display:flex;gap:6px;font-weight:700}
+.weight-box{background:#fafafa;border:1px dashed #ddd;border-radius:12px;padding:8px;text-align:center;margin:8px 0;font-size:13px;font-weight:700;color:#666}
+.timer-box{border:2px dashed #d00;border-radius:12px;padding:8px;text-align:center;margin:10px 0;font-weight:800;font-size:13px;color:#333}
+.timer-box span{color:#d00;font-weight:900;font-size:16px}
+.btn-orange{background:#ff6a00;color:white;border:none;width:100%;padding:14px;border-radius:14px;font-family:'Cairo';font-weight:900;font-size:15px;cursor:pointer}
+.btn-waiting{background:#ffcc00!important;color:#111!important;border:2px solid #ffb300}
+#noBalanceOverlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;display:none;align-items:center;justify-content:center;flex-direction:column;color:white;text-align:center;padding:20px}
+#noBalanceOverlay.show{display:flex}
+#noBalanceOverlay a{background:#ff6a00;color:white;padding:14px 28px;border-radius:14px;text-decoration:none;font-weight:900;margin-top:15px;display:inline-block}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:white;display:flex;justify-content:space-around;padding:8px 0;box-shadow:0 -2px 10px rgba(0,0,0,.08);z-index:20}
+.nav-item{text-align:center;color:#999;font-size:11px;text-decoration:none;font-weight:700}
+.nav-item.active{color:#ff6a00}
+.nav-item i{font-size:20px;display:block;margin-bottom:2px}
+.recipient-box{background:#f3e8ff;border:1.5px solid #7c3aed;border-radius:12px;padding:8px 10px;margin:6px 0;display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:13px;color:#4c1d95}
+.recipient-box a{background:#7c3aed;color:white;padding:4px 12px;border-radius:20px;text-decoration:none;font-size:12px}
+</style>
+</head>
+<body>
+
+<div id="noBalanceOverlay">
+  <i class="fa-solid fa-wallet" style="font-size:60px;margin-bottom:15px"></i>
+  <h2 style="margin:0">رصيدك صفر</h2>
+  <p>لازم تشحن عشان تقدر تستقبل طلبات</p>
+  <a href="profile.html">اذهب للشحن <i class="fa-solid fa-arrow-left"></i></a>
+</div>
+
+<div class="header">📦 طلبات التوصيل</div>
+<div class="top-bar"><span id="countOrders">0 طلبات</span><span>رصيدك: <b id="bal">--</b> ج</span></div>
+<div id="ordersList"></div>
+
+<div class="bottom-nav">
+  <a href="profile.html" class="nav-item"><i class="fa-regular fa-user"></i>حسابي</a>
+  <a href="orders.html" class="nav-item active"><i class="fa-solid fa-list"></i>الطلبات</a>
+  <a href="map.html" class="nav-item"><i class="fa-regular fa-location-dot"></i>الموقع</a>
+  <a href="index.html" class="nav-item"><i class="fa-solid fa-house"></i>الرئيسية</a>
+</div>
+
+<script>
+function clean(p){return String(p||'').replace(/\D/g,'');}
+function getCourierPhone(o){ if(!o) return ''; return clean(o.courier?.phone || o.courier || o.riderPhone || ''); }
+let riderKey = clean(localStorage.getItem('riderPhone')||'');
+let riderBalance = 0;
+const FIVE_HOURS = 5*60*60*1000;
+const DETAILS_PAGE = 'rider-order-details.html';
+
+async function fetchBalance(){
+  try{
+    let res = await fetch(DB_URL+'/riders/'+riderKey+'.json');
+    let data = await res.json();
+    if(!data){
+      let res2 = await fetch(DB_URL+'/riders.json');
+      let all = await res2.json();
+      if(all){ for(let k in all){ if(clean(all[k].phone||k)==riderKey){ data=all[k]; break; } } }
+    }
+    riderBalance = parseFloat(data?.balance?? data?.رصيد?? localStorage.getItem('riderBalance')?? 0);
+    document.getElementById('bal').innerText = riderBalance.toFixed(0);
+    localStorage.setItem('riderBalance', riderBalance);
+    if(riderBalance<=0){
+      document.body.classList.add('no-balance');
+      document.getElementById('noBalanceOverlay').classList.add('show');
+    } else {
+      document.body.classList.remove('no-balance');
+      document.getElementById('noBalanceOverlay').classList.remove('show');
+    }
+  }catch(e){
+    riderBalance = parseFloat(localStorage.getItem('riderBalance')||0);
+    document.getElementById('bal').innerText = riderBalance;
+    if(riderBalance<=0){
+      document.body.classList.add('no-balance');
+      document.getElementById('noBalanceOverlay').classList.add('show');
+    }
+  }
+}
+
+function getCreatedTime(o){
+  let v = o?.createdAt?? o?.timestamp?? 0;
+  let num = parseInt(v);
+  if(!isNaN(num) && num > 1e12) return num;
+  if(!isNaN(num) && num > 1e9) return num*1000;
+  return Date.now();
+}
+
+async function checkMyActiveOrder(){
+  let res = await fetch(DB_URL+'/orders.json');
+  let data = await res.json(); if(!data) return false;
+  for(let id in data){
+    let o = data[id];
+    if(getCourierPhone(o)==riderKey && ['accepted','picked','on_the_way','in_delivery','assigned'].includes(o.status||'')){
+      localStorage.setItem('current_rider_order_id', id);
+      location.href = DETAILS_PAGE+'?id='+id;
+      return true;
+    }
+  }
+  return false;
+}
+
+async function loadDeliveryOrders(){
+  if(await checkMyActiveOrder()) return;
+  try{
+    let res = await fetch(DB_URL+'/orders.json?t='+Date.now());
+    let data = await res.json();
+    let list = document.getElementById('ordersList');
+    list.innerHTML='';
+    if(!data){ document.getElementById('countOrders').innerText='لا يوجد طلبات'; return; }
+    let orders = Object.entries(data).map(([fbId,v])=>({...v, fbId})).filter(o=>{
+      if(!o) return false;
+      let type = (o.type||o.service||'').toLowerCase();
+      let isDelivery = type.includes('tawseel') || type.includes('delivery') || type.includes('توصيل') || o.isParcel==true || o.deliveryType=='p2p';
+      if(!isDelivery) return false;
+      let cPhone = getCourierPhone(o);
+      if(cPhone && cPhone!=riderKey) return false;
+      if(cPhone==riderKey) return false;
+      if((o.status||'pending')!='pending') return false;
+      let created = getCreatedTime(o);
+      if(Date.now() - created > FIVE_HOURS){ fetch(DB_URL+'/orders/'+o.fbId+'.json',{method:'DELETE'}); return false; }
+      return true;
+    }).sort((a,b)=>getCreatedTime(b)-getCreatedTime(a));
+    document.getElementById('countOrders').innerText = orders.length+' طلبات';
+    if(orders.length==0){
+      list.innerHTML = '<div style="text-align:center;padding:40px;color:#999">مفيش طلبات حاليا</div>';
+      return;
+    }
+    orders.forEach(o=>{
+      let created = getCreatedTime(o);
+      let remain = FIVE_HOURS - (Date.now() - created);
+      let h=Math.floor(remain/3600000), m=Math.floor((remain%3600000)/60000), s=Math.floor((remain%60000)/1000);
+      let remainStr = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+      let alreadySent = o.offers && o.offers[riderKey];
+      let from = o.pickupAddress || o.fromAddress || 'مكان الاستلام';
+      let to = o.dropoffAddress || o.toAddress || 'مكان التسليم';
+      let sender = o.senderName || o.clientName || o.receiverName || 'عميل';
+      let senderPhone = o.senderPhone || o.clientPhone || '';
+      let recipientPhone = o.recipientPhone || o.receiverPhone || o.toPhone || '';
+      let recipientName = o.recipientName || o.receiverName || o.toName || 'المستلم';
+      let weight = o.weight || o.packageDesc || 'طرد';
+      let fee = o.total || o.fee || 40;
+      let diffMs = Date.now() - created;
+      let diffMin = Math.floor(diffMs / 60000);
+      let timeAgoText = diffMin < 1? 'الآن' : (diffMin < 60? `منذ ${diffMin} د` : `منذ ${Math.floor(diffMin/60)} س ${diffMin%60} د`);
+      let recipientHtml = recipientPhone? `<div class="recipient-box"><span><i class="fa-solid fa-user-check"></i> مستلم: ${recipientName} - ${recipientPhone}</span><a href="tel:${recipientPhone}"><i class="fa-solid fa-phone"></i> اتصال</a></div>` : `<div class="recipient-box" style="background:#ffeaea;border-color:#d00;color:#900"><span><i class="fa-solid fa-triangle-exclamation"></i> مفيش رقم مستلم (طلب قديم)</span></div>`;
+      let card = document.createElement('div');
+      card.className='order-card';
+      card.innerHTML = `
+        <div class="card-top">
+          <div class="price-badge">${fee} جنيه <small>التوصيل</small></div>
+          <div class="pkg-icon"><i class="fa-solid fa-box"></i></div>
+          <div class="time-badge"><i class="fa-regular fa-clock"></i> ${timeAgoText}</div>
+        </div>
+        <div class="client-line"><span><i class="fa-regular fa-user"></i> ${sender} - ${senderPhone}</span></div>
+        ${recipientHtml}
+        <div class="addr"><i class="fa-solid fa-location-dot" style="color:#0a9e3f"></i> ${from}</div>
+        <div class="weight-box">${weight} - إلى: ${to}</div>
+        <div class="timer-box">⏳ ينتهي بعد: <span class="timer" data-created="${created}" data-id="${o.fbId}">${remainStr}</span></div>
+        <button class="btn-orange ${alreadySent?'btn-waiting':''}" id="btn-${o.fbId}" onclick="sendOffer('${o.fbId}','${fee}')" ${alreadySent?'disabled':''}>
+          ${alreadySent? '⏳ في انتظار اختيار العميل' : 'قبول الطلب - ارسال عرض للعميل <i class="fa-solid fa-paper-plane"></i>'}
+        </button>
+      `;
+      list.appendChild(card);
+      if(alreadySent) watchIfClientChoosed(o.fbId);
+    });
+  }catch(e){console.log(e)}
+}
+
+async function sendOffer(fbId, orderFee){
+  if(riderBalance<=0){ alert('رصيدك صفر - اذهب للشحن'); return; }
+  let btn = document.getElementById('btn-'+fbId);
+  btn.disabled = true; btn.innerHTML = 'جاري الارسال...';
+  let riderName = localStorage.getItem('riderName')||'مندوب سهلة';
+  let lat=30.0444,lng=31.2357;
+  try{ let p = await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{timeout:4000})); lat=p.coords.latitude; lng=p.coords.longitude; }catch(e){}
+  let offer = { courierId:riderKey, name:riderName, phone:riderKey, fee:orderFee, lat, lng, distance:'قريب', createdAt:Date.now() };
+  await fetch(DB_URL+'/orders/'+fbId+'/offers/'+riderKey+'.json',{method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(offer)});
+  btn.className='btn-orange btn-waiting';
+  btn.innerHTML='⏳ في انتظار اختيار العميل';
+  watchIfClientChoosed(fbId);
+}
+
+function watchIfClientChoosed(fbId){
+  let interval = setInterval(async()=>{
+    let r = await fetch(DB_URL+'/orders/'+fbId+'.json');
+    let o = await r.json(); if(!o){ clearInterval(interval); return; }
+    if(getCourierPhone(o)==riderKey){ clearInterval(interval); localStorage.setItem('current_rider_order_id', fbId); location.href = DETAILS_PAGE+'?id='+fbId; }
+  },3000);
+}
+
+function startCountdown(){
+  setInterval(()=>{
+    document.querySelectorAll('.timer').forEach(el=>{
+      let created=parseInt(el.dataset.created), id=el.dataset.id;
+      let remain=FIVE_HOURS-(Date.now()-created);
+      if(remain<=0){ fetch(DB_URL+'/orders/'+id+'.json',{method:'DELETE'}); el.closest('.order-card')?.remove(); }
+      else{ let h=Math.floor(remain/3600000), m=Math.floor((remain%3600000)/60000), s=Math.floor((remain%60000)/1000); el.innerText=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`; }
+    });
+  },1000);
+}
+
+fetchBalance().then(()=>{ loadDeliveryOrders(); });
+startCountdown();
+setInterval(loadDeliveryOrders,10000);
+setInterval(checkMyActiveOrder,5000);
+</script>
+</body>
+  </html>
