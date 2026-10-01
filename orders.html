@@ -194,6 +194,7 @@ async function loadOrders(){
     let allOrders = Object.entries(data).map(([fbId,val])=>({...val, _fbId:fbId, fbId:fbId}));
     let orders = allOrders.filter(o=>{
       if(!o) return false;
+      if(o.type === 'delivery' || o.fromPlace) return false;
       let s = (o.status||'').toLowerCase();
       let isPending = s=='pending' || s=='جديد' || s=='new' || s=='' || s=='null';
       if(o.courier && o.courier.phone){
