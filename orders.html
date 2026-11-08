@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+محمد<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
@@ -319,4 +319,8 @@ init();
 setInterval(async ()=>{
   let active = await restoreActiveOrder();
   if(active){
-    try{ let r = await fetch(DB_URL+'/orders/'+active+'.json?t='+Date.now()); let oo = await r.json(); if(oo && isCartOrder(oo) && oo.courier && clean(oo.courier.phone)===riderKey){ window.locat
+    try{ let r = await fetch(DB_URL+'/orders/'+active+'.json?t='+Date.now()); let oo = await r.json(); if(oo && isCartOrder(oo) && oo.courier && clean(oo.courier.phone)===riderKey){ window.location.raplace('order-details.html?id='+active); } }catch(e){}
+load0rders(); 
+</script>
+</body>
+</html>  
